@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture — Overload: Venom and Glass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+SC:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @font-face{
+    font-family:'Doctor Glitch';
+    src: url('Doctor_Glitch.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root{
+    --bg:#040308;
+    --bg-panel:#0a0714;
+    --violet:#8b6bf0;
+    --violet-deep:#4c2f9e;
+    --cyan:#3fd7d0;
+    --text:#eae7f5;
+    --text-dim:#8c86a6;
+    --line: rgba(139,107,240,0.28);
+    --line-soft: rgba(139,107,240,0.14);
+    --ease-out: cubic-bezier(0.19,1,0.22,1);
+    --ease-out-cubic: cubic-bezier(0.215,0.61,0.355,1);
+    --ease-in-out: cubic-bezier(0.645,0.045,0.355,1);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{
+    scroll-behavior:smooth;
+  }
+
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  ::selection{ background:var(--violet-deep); color:#fff; }
+
+  /* ---------- SCROLLBAR ---------- */
+  html{
+    scrollbar-width: thin;
+    scrollbar-color: var(--violet) var(--bg);
+  }
+  ::-webkit-scrollbar{
+    width:11px;
+    height:11px;
+  }
+  ::-webkit-scrollbar-track{
+    background: var(--bg);
+    border-left:1px solid var(--line-soft);
+  }
+  ::-webkit-scrollbar-thumb{
+    background: linear-gradient(180deg, var(--violet) 0%, var(--violet-deep) 100%);
+    border-radius:0;
+    border:2px solid var(--bg);
+    box-shadow: inset 0 0 6px rgba(63,215,208,0.25);
+  }
+  ::-webkit-scrollbar-thumb:hover{
+    background: linear-gradient(180deg, var(--cyan) 0%, var(--violet) 100%);
+  }
+  ::-webkit-scrollbar-corner{
+    background: var(--bg);
+  }
+
+  /* ---------- HERO / VIDEO BG ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: clamp(32px, 6vh, 72px) 24px 40px;
+    overflow:hidden;
+    background: var(--bg);
+  }
+
+  .bg-video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter: saturate(1.25) contrast(1.12) brightness(0.85);
+    z-index:0;
+    transition: opacity 100ms linear;
+  }
+
+  .bg-scrim{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:
+      radial-gradient(ellipse 78% 62% at 50% 30%, rgba(10,7,20,0.05) 0%, rgba(4,3,8,0.28) 55%, rgba(4,3,8,0.68) 100%),
+      linear-gradient(180deg, rgba(4,3,8,0.25) 0%, rgba(4,3,8,0.08) 26%, rgba(4,3,8,0.55) 78%, var(--bg) 100%);
+  }
+
+  .noise{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- MAIN (centers between header space and footer) ---------- */
+  .page-main{
+    position:relative;
+    z-index:3;
+    flex:1 1 auto;
+    width:100%;
+    max-width:820px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:34px;
+  }
+
+  .page-eyebrow{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:clamp(1.4rem, 3vw, 1.9rem);
+    color:var(--violet);
+    text-shadow:0 0 24px rgba(139,107,240,0.5);
+    margin:0;
+  }
+
+  .page-title{
+    font-family:'Doctor Glitch', 'Playfair Display', serif;
+    font-weight:400;
+    font-size:clamp(2.6rem, 9vw, 5.6rem);
+    line-height:0.95;
+    letter-spacing:0.01em;
+    margin:0;
+    position:relative;
+    color:#f2f0fa;
+    text-shadow: 0 4px 30px rgba(4,3,8,0.9);
+  }
+
+  .page-title::before,
+  .page-title::after{
+    content: attr(data-text);
+    position:absolute;
+    inset:0;
+    background:transparent;
+  }
+  .page-title::before{
+    color:var(--cyan);
+    text-shadow: 0 0 26px rgba(63,215,208,0.55);
+    animation: pg-glitch-1 4.6s var(--ease-in-out) infinite;
+    clip-path: inset(0 0 55% 0);
+    mix-blend-mode: screen;
+    opacity:0;
+  }
+  .page-title::after{
+    color:var(--violet);
+    text-shadow: 0 0 26px rgba(139,107,240,0.55);
+    animation: pg-glitch-2 4.6s var(--ease-in-out) infinite;
+    clip-path: inset(60% 0 0 0);
+    mix-blend-mode: screen;
+    opacity:0;
+  }
+  @keyframes pg-glitch-1{
+    0%, 80%, 100% { transform:translate(0,0); clip-path: inset(0 0 55% 0); opacity:0; }
+    81% { transform:translate(-6px,-2px); clip-path: inset(8% 0 42% 0); opacity:0.9; }
+    84% { transform:translate(4px,1px); clip-path: inset(0 0 68% 0); opacity:0.6; }
+    87% { transform:translate(-3px,0); clip-path: inset(20% 0 25% 0); opacity:0.8; }
+    90% { transform:translate(0,0); opacity:0; }
+  }
+  @keyframes pg-glitch-2{
+    0%, 82%, 100% { transform:translate(0,0); clip-path: inset(60% 0 0 0); opacity:0; }
+    83% { transform:translate(6px,2px); clip-path: inset(35% 0 0 0); opacity:0.85; }
+    86% { transform:translate(-4px,-1px); clip-path: inset(72% 0 0 0); opacity:0.55; }
+    89% { transform:translate(3px,0); clip-path: inset(50% 0 0 0); opacity:0.75; }
+    92% { transform:translate(0,0); opacity:0; }
+  }
+
+  .page-sub{
+    font-family:'Cormorant SC', serif;
+    font-weight:500;
+    font-size:clamp(0.95rem, 2vw, 1.15rem);
+    letter-spacing:0.16em;
+    color:var(--text-dim);
+    margin:0;
+  }
+
+  /* ---------- SCROLL CUE ---------- */
+  .scroll-cue{
+    position:absolute;
+    left:50%;
+    bottom: clamp(20px, 4vh, 40px);
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    color: var(--text-dim);
+    transform:translateX(-50%);
+    transition: color 200ms ease;
+    animation: scroll-cue-bounce 2.2s ease-in-out infinite;
+  }
+  .scroll-cue:hover, .scroll-cue:focus-visible{
+    color: var(--violet);
+  }
+  .scroll-cue svg{ width:22px; height:22px; display:block; }
+  .scroll-cue:focus-visible{ outline:2px solid var(--cyan); outline-offset:4px; }
+
+  @keyframes scroll-cue-bounce{
+    0%, 100% { transform:translate(-50%, 0); }
+    50%      { transform:translate(-50%, 8px); }
+  }
+
+  /* ---------- BACK BUTTON (same bracket + glitch language as the index rows) ---------- */
+  .back-btn{
+    all:unset;
+    position:fixed;
+    top: clamp(18px, 4vh, 32px);
+    left: clamp(18px, 4vw, 32px);
+    z-index:6;
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 22px;
+    cursor:pointer;
+    box-sizing:border-box;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:500;
+    font-size:0.85rem;
+    letter-spacing:0.06em;
+    color:var(--text);
+  }
+  .back-btn::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    opacity:0;
+    transition: opacity 200ms ease;
+  }
+  .back-btn::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:0;
+    bottom:0;
+    width:16px;
+    height:16px;
+    opacity:0;
+    transition: opacity 200ms ease 40ms;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+  }
+  .back-btn:hover::before, .back-btn:focus-visible::before,
+  .back-btn:hover::after, .back-btn:focus-visible::after{
+    opacity:1;
+  }
+  .back-btn:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
+
+  .back-chevron{
+    position:relative; z-index:1;
+    width:8px; height:8px;
+    border-left:1.5px solid var(--text-dim);
+    border-bottom:1.5px solid var(--text-dim);
+    transform:rotate(45deg);
+    transition: transform 220ms var(--ease-out-cubic), border-color 200ms ease;
+    flex-shrink:0;
+  }
+  .back-btn:hover .back-chevron{ border-color:var(--violet); transform:rotate(45deg) translate(-2px,2px); }
+
+  .back-label{ position:relative; z-index:1; }
+  .back-label::before,
+  .back-label::after{
+    content: attr(data-text);
+    position:absolute;
+    z-index:2;
+    left:0; top:0;
+    width:100%;
+    white-space:nowrap;
+    pointer-events:none;
+    opacity:0;
+  }
+  .back-label::before{ color:var(--violet); text-shadow:0 0 14px rgba(139,107,240,0.65); }
+  .back-label::after{ color:var(--cyan); text-shadow:0 0 14px rgba(63,215,208,0.6); }
+  .back-btn:is(:hover,:focus-visible) .back-label::before{ animation: pg-row-glitch-violet 640ms steps(1) 1; }
+  .back-btn:is(:hover,:focus-visible) .back-label::after{ animation: pg-row-glitch-cyan 640ms steps(1) 1; }
+
+  @keyframes pg-row-glitch-violet{
+    0%   { clip-path: inset(0 0 88% 0);  transform:translate(0,0);    opacity:0; }
+    7%   { clip-path: inset(0 0 58% 0);  transform:translate(-4px,0); opacity:0.9; }
+    15%  { clip-path: inset(28% 0 42% 0); transform:translate(3px,0); opacity:0.65; }
+    23%  { clip-path: inset(0 0 74% 0);  transform:translate(-3px,0); opacity:0.85; }
+    31%  { clip-path: inset(52% 0 8% 0); transform:translate(4px,0);  opacity:0.55; }
+    40%  { clip-path: inset(0 0 88% 0);  transform:translate(0,0);    opacity:0; }
+    100% { opacity:0; }
+  }
+  @keyframes pg-row-glitch-cyan{
+    0%   { clip-path: inset(88% 0 0 0); transform:translate(0,0);     opacity:0; }
+    9%   { clip-path: inset(48% 0 0 0); transform:translate(4px,0);   opacity:0.85; }
+    17%  { clip-path: inset(18% 0 46% 0); transform:translate(-3px,0); opacity:0.6; }
+    25%  { clip-path: inset(58% 0 0 0); transform:translate(3px,0);   opacity:0.8; }
+    33%  { clip-path: inset(8% 0 60% 0); transform:translate(-4px,0);  opacity:0.5; }
+    42%  { clip-path: inset(88% 0 0 0); transform:translate(0,0);     opacity:0; }
+    100% { opacity:0; }
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer{
+    position:relative;
+    z-index:3;
+    margin:44px auto 0;
+    padding:0 24px 48px;
+    width:100%;
+    max-width:760px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+  }
+  .footer-text{
+    text-align:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(140,134,166,0.6);
+    line-height:1.9;
+  }
+  .footer-text a{
+    color:rgba(140,134,166,0.85);
+    text-decoration:none;
+    border-bottom:1px solid rgba(139,107,240,0.3);
+    transition: color 180ms ease, border-color 180ms ease;
+  }
+  .footer-text a:hover, .footer-text a:focus-visible{
+    color:var(--violet);
+    border-color:var(--violet);
+  }
+  .socials{ display:flex; gap:20px; }
+  .socials a{
+    color:var(--text-dim);
+    transition: color 180ms ease, transform 180ms var(--ease-out-cubic);
+    display:flex;
+  }
+  .socials a:hover{ color:var(--violet); transform:translateY(-2px); }
+  .socials svg{ width:17px; height:17px; }
+
+  /* ---------- STORY / READING SECTION ---------- */
+  .story-section{
+    position:relative;
+    z-index:1;
+    background: var(--bg);
+    padding: clamp(56px, 9vh, 96px) 24px 8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .story-content{
+    width:100%;
+    max-width:680px;
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.15rem;
+    line-height:1.85;
+    color:var(--text-dim);
+  }
+
+  .story-lede{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:1.5rem;
+    color:var(--text);
+    text-align:center;
+    margin:0 0 44px;
+  }
+
+  .story-narration{
+    margin:0 0 24px;
+  }
+
+  .story-dialogue-block{
+    margin:0 0 24px;
+  }
+  .story-speaker{
+    display:block;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.66rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .story-speaker--aurelio{ color:var(--cyan); }
+  .story-speaker--avery{ color:var(--violet); }
+
+  .story-dialogue{
+    margin:0;
+    padding-left:18px;
+    border-left:2px solid var(--line);
+    color:var(--text);
+    font-size:1.18rem;
+  }
+  .story-dialogue--aurelio{ border-left-color:var(--cyan); }
+  .story-dialogue--avery{ border-left-color:var(--violet); }
+
+  /* ---------- FINAL CTA: external ministry-records link ---------- */
+  .story-cta{
+    all:unset;
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    width:100%;
+    max-width:680px;
+    margin:52px auto 0;
+    padding:22px 18px;
+    cursor:pointer;
+    box-sizing:border-box;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .story-cta::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:var(--bg-panel);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    opacity:0;
+    transition: opacity 200ms ease;
+  }
+  .story-cta::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:0; bottom:0;
+    width:16px; height:16px;
+    opacity:0;
+    transition: opacity 200ms ease 40ms;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+  }
+  .story-cta:hover::before, .story-cta:focus-visible::before,
+  .story-cta:hover::after, .story-cta:focus-visible::after{
+    opacity:1;
+  }
+  .story-cta:focus-visible{ outline:2px solid var(--cyan); outline-offset:-2px; }
+
+  .story-cta-mark{
+    position:relative; z-index:1;
+    flex-shrink:0;
+    width:22px; height:22px;
+    color:var(--text-dim);
+    transition:color 200ms ease;
+  }
+  .story-cta-mark svg{ width:100%; height:100%; display:block; }
+  .story-cta:hover .story-cta-mark{ color:var(--violet); }
+
+  .story-cta-label{
+    position:relative; z-index:1;
+    flex:1;
+    text-align:left;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:500;
+    font-size:1rem;
+    letter-spacing:0.01em;
+    color:var(--text);
+  }
+  .story-cta-label::before,
+  .story-cta-label::after{
+    content: attr(data-text);
+    position:absolute;
+    z-index:2;
+    left:0; top:0;
+    width:100%;
+    pointer-events:none;
+    opacity:0;
+  }
+  .story-cta-label::before{ color:var(--violet); text-shadow:0 0 14px rgba(139,107,240,0.65); }
+  .story-cta-label::after{ color:var(--cyan); text-shadow:0 0 14px rgba(63,215,208,0.6); }
+  .story-cta:is(:hover,:focus-visible) .story-cta-label::before{ animation: pg-row-glitch-violet 640ms steps(1) 1; }
+  .story-cta:is(:hover,:focus-visible) .story-cta-label::after{ animation: pg-row-glitch-cyan 640ms steps(1) 1; }
+
+  .story-cta-arrow{
+    position:relative; z-index:1;
+    flex-shrink:0;
+    width:15px; height:15px;
+    color:var(--text-dim);
+    transition: color 200ms ease, transform 220ms var(--ease-out-cubic);
+  }
+  .story-cta-arrow svg{ width:100%; height:100%; display:block; }
+  .story-cta:hover .story-cta-arrow{ color:var(--violet); transform:translate(2px,-2px); }
+
+  @media (max-width: 560px){
+    .story-content{ font-size:1.05rem; }
+    .story-dialogue{ font-size:1.08rem; padding-left:14px; }
+    .story-lede{ font-size:1.3rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .page-title::before, .page-title::after,
+    .back-label::before, .back-label::after,
+    .back-chevron,
+    .story-cta-label::before, .story-cta-label::after,
+    .story-cta-arrow,
+    .scroll-cue{ animation:none; transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <video class="bg-video" id="video-forward" autoplay muted playsinline preload="auto">
+    <source src="architecture.mp4" type="video/mp4">
+  </video>
+  <video class="bg-video" id="video-reverse" muted playsinline preload="auto" style="opacity:0;">
+    <source src="architecture-reverse.mp4" type="video/mp4">
+  </video>
+  <div class="bg-scrim"></div>
+  <div class="noise"></div>
+
+    <a class="back-btn" href="index.html">
+      <span class="back-chevron"></span>
+      <span class="back-label" data-text="Volver al índice">Volver al índice</span>
+    </a>
+
+  <main class="page-main">
+    <p class="page-eyebrow">I.</p>
+    <h1 class="page-title" data-text="Architecture">Architecture</h1>
+    <p class="page-sub">Overload: Venom and Glass</p>
+  </main>
+
+  <a class="scroll-cue" href="#story" aria-label="Desplazarse para leer el capítulo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </a>
+</div>
+
+<article class="story-section" id="story">
+  <div class="story-content">
+          <p class="story-lede">La mansión Avery no recibía visitas. Recibía comparecencias.</p>
+
+          <p class="story-narration">Aurelio lo supo apenas cruzó las rejas: el elfo doméstico que lo escoltó por el sendero de grava —viejo, de orejas caídas y piel curtida como cuero de años, que se movía con la lentitud de quien conoce cada baldosa de memoria— no habló en ningún momento, no ofreció nada, se limitó a caminar dos pasos por delante como quien guía a alguien hacia un lugar del que preferiría no dar indicaciones para volver. Aurelio no le preguntó el nombre. No hacía falta: los elfos de las casas viejas como los Avery llevaban generaciones sirviendo a la misma familia, y este en particular —Wips, si la memoria de Aurelio de visitas anteriores no le fallaba— tenía la clase de antigüedad en la casa que lo volvía casi mobiliario, otro objeto más al que nadie le dirigía la palabra salvo para dar una orden. El aire olía a jazmines y, debajo de eso, a algo más viejo — piedra húmeda, magia acumulada en las paredes durante generaciones, la clase de frío que ningún hechizo de calefacción termina de disimular del todo.</p>
+
+          <p class="story-narration">Lo hicieron esperar en un salón con retratos. Ninguno se movía para saludarlo. Uno, en particular —una mujer joven de rasgos afilados y mirada clara, colgado en un lugar de honor demasiado cercano a la chimenea para ser casualidad— parecía seguirlo con los ojos cada vez que Aurelio cambiaba de posición. No le devolvió la mirada más de lo necesario.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—Shacklebolt.</p></div>
+
+          <p class="story-narration">La voz vino desde la puerta antes de que Aurelio terminara de girar. Elian Avery no entraba a una habitación: la ocupaba, de golpe, como si el espacio ya le perteneciera desde antes de pisarlo. Alto, de movimientos económicos, con esa clase de calma que en los Avery nunca fue templanza sino control absoluto sobre cuándo mostrar algo. Se sentó sin invitar a Aurelio a hacer lo mismo, y solo después, con un gesto mínimo de la mano, le concedió el sillón de enfrente.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—Me dijeron que tenía algo para mí. Sobre Núcleos de Sangre.</p></div>
+
+          <p class="story-narration">La puerta volvió a abrirse apenas un segundo después. Wips entró con una bandeja, la taza humeando, y la dejó en el escritorio junto al codo de Elian con la precisión silenciosa de diez mil tés servidos de la misma manera. No miró a Aurelio. No le ofreció nada. Se retiró con la misma reverencia breve con la que había entrado, y la puerta volvió a cerrarse.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Diez años de eso —dijo Aurelio, y se sentó.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—Entonces más vale que valga los diez años. El proyecto viene de antes que yo, Shacklebolt. Lo heredé sin un solo avance real que mostrar. Si usted tiene algo, quiero escucharlo entero, no un resumen prolijo para quedar bien.</p></div>
+
+          <p class="story-narration">Aurelio no se apuró. Cruzó una pierna, apoyó las manos sobre la rodilla, y empezó por donde tenía que empezar, aunque supiera que no era la parte que Avery quería escuchar primero.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Empieza hace diez años, en un prado de Godric's Hollow. Y empieza conmigo pasando la ubicación de un hombre que confiaba en mí. Horace Wood.</p></div>
+
+          <p class="story-narration">Avery no reaccionó. Ni una ceja, ni un cambio en la postura. Solo lo miró, con la misma paciencia fría con la que un acreedor mira a alguien que todavía no terminó de explicar por qué debería cobrarle menos. Un leño se acomodó en la chimenea, con un chasquido seco que fue lo único que interrumpió el silencio.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Horace y yo trabajábamos juntos —siguió Aurelio—. Compañeros de toda la vida, del mismo despacho: Oficina para la Detección y Confiscación de Falsificación de los Hechizos Defensivos y Objetos de Protección, dentro de Seguridad Mágica. Amigos antes que colegas, si eso te importa saberlo. Y Horace se enteró de algo que no tendría que haber sabido nunca: mi participación en Núcleos de Sangre. El proyecto de los Nott. El mismo por el que estamos hablando hoy. No sé todavía por dónde se filtró, si fue descuido mío o si alguien se lo dijo a propósito para ver qué hacía con eso. Lo que importa es que él lo supo —que yo ya estaba metido en esto hace diez años, mucho antes de que a vos te tocara heredarlo— y que un hombre como Horace no se iba a quedar callado.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—Así que lo resolviste.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Así que lo resolví. No fue un ataque al azar sobre dos aurores en investigación de campo, como quedó en el legajo. Fue información mía. No hace falta que entremos en el detalle de cómo llegó hasta quién tenía que llegar; alcanza con que sepas que cuando el grupo llegó al prado, no llegó por casualidad. Yo llegué después. No antes. Con el tiempo justo para que nadie pudiera decir que había estado ahí cuando pasó, y con la coartada más fácil del mundo, porque era cierta hasta ese punto: dije que iba a encontrarme con Horace. Amigos de toda la vida reuniéndose un fin de semana. Nadie hizo una sola pregunta.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—¿Y el problema? —Avery levantó la taza, sin apuro, y bebió un sorbo antes de terminar la pregunta, con el tono de quien ya sospecha la respuesta y solo quiere confirmar que el otro sabe contarla bien.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—El problema no era Horace. Horace ya estaba resuelto. El problema era el chico de siete años sentado al lado del cuerpo, que había visto y escuchado más de lo que un testigo de esa edad debería poder sostener. Oliver Wood. Sobrino de Horace.</p></div>
+
+          <p class="story-narration">Avery entrecerró los ojos, apenas.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Y peor todavía —agregó Aurelio, sin esperar la pregunta—: un chico que me conocía. Yo era el amigo de su tío, la cara que había visto en su casa un montón de veces antes de esa noche. No hacía falta que recordara los detalles del ataque para hundirme. Con que dijera mi nombre alcanzaba.</p></div>
+
+          <p class="story-narration">Aurelio hizo una pausa, la primera desde que empezó a hablar. No por efecto — porque necesitaba elegir bien la siguiente frase.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Así que hice lo que había que hacer. —Aurelio desvió la vista un momento hacia el fuego, como si el relato le pesara menos mirando las llamas que mirando a Avery—. Le entré a la cabeza esa misma noche, ahí mismo, en el pasto, y le saqué lo que hiciera falta sacarle. En el legajo quedó como intervención de contención de emergencia. No fue eso. Fue borrado. Rápido, sucio, funcional. No me alcanzaba con que olvidara el ataque en sí — tenía que asegurarme de que no pudiera atar mi cara, mi nombre, cualquier cosa de esa noche, con lo que le había pasado a su tío. Eso tenía que dejar de existir antes de que alguien más se lo preguntara.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—Funcionó —dijo Avery. No era pregunta.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Funcionó. Y como funcionó, tuve que quedarme. La familia se negó a llevarlo a control institucional, y en vez de alegrarme por sacarme el problema de encima, entendí que era mejor así: nadie más revisando esa cabeza. Solo yo. Semana a semana, durante diez años. Legeremancia. No es tratamiento. Nunca lo fue. Es mantenimiento: asegurarme de que lo que había tapado esa noche siguiera tapado.</p></div>
+
+          <p class="story-narration">Elian se recostó en el sillón, cruzó las manos sobre el regazo, y por primera vez algo parecido a interés le cambió la expresión.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Diez años sin que nadie lo auditara —continuó Aurelio—, sin que nadie preguntara, porque yo mismo era quien tenía que evitar que se auditara. Eso, durante años, fue todo. Revisión, silencio, control. Aburrido, casi, y cómodo.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—¿Hasta cuándo?</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Hasta segundo año. Algo empezó a no cerrar. No te puedo dar una fecha exacta, porque en su momento no até nada — fue más una sensación de que la resistencia que encontraba en las sesiones tenía una textura distinta a la de un borrado sosteniéndose. No era solo pared aguantando. Había algo asomando a devolver, como si del otro lado hubiera más que lo que yo mismo había puesto ahí. No lo dije en ningún lado. Lo guardé.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—¿Y después?</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Después hice lo que hago siempre que algo no me cierra. Leí. Para entonces ya me habían movido a Regulación y Confiscación de Objetos Mágicos —un cambio que en el papel parece un paso al costado, pero que en la práctica es la cobertura perfecta: nadie pregunta por qué un oficial de catalogación anda entre casas de sangre pura y manuscritos confiscados. Fui yo quien catalogó lo que quedó de la biblioteca Morganach después de la caída del último integrante del linaje. Ahí encontré lo que necesitaba.</p></div>
+
+          <p class="story-narration">La taza de Avery, intacta desde el primer sorbo, había dejado de humear sobre el escritorio. Ninguno de los dos le prestó atención.</p>
+
+          <p class="story-narration">Aurelio se detuvo un segundo, midiendo el efecto de lo que venía.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Lo que tenía ese chico no era el recuerdo de un Oclumante comportándose raro. Era Magia Ancestral, operando hacia adentro, sobre la misma arquitectura que yo mismo le había construido para taparle la boca.</p></div>
+
+          <p class="story-narration">Por primera vez, Avery se inclinó hacia adelante.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Tercer año —siguió Aurelio, sin dejarse apurar por el gesto—. Trece años. Ahí dejé de observar y empecé a trabajar. Diseñé las sesiones para cultivarlo, no para vigilarlo. Espejos, en vez de un muro liso tapando un agujero. Le enseñé a construir algo mucho más sofisticado de lo que cualquier Oclumante de su edad podría sostener, y se lo vendí como el paso natural de su entrenamiento. Nunca le dije qué era en realidad. Tampoco le dije nunca qué fue lo que en verdad pasó esa noche con su tío. Las dos mentiras se sostienen juntas. Si una se cae, la otra la sigue.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—¿Y él nunca sospechó nada?</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Tiene un patrón que se puede leer a simple vista, si sabés mirar. Habla de Quidditch todo el tiempo —táctica, jugadas, lo que sea— y en el momento exacto en que la conversación se acerca a algo que importa de verdad, corta. No de a poco. Corta como quien cierra una puerta de un golpe y sigue hablando de otra cosa como si no hubiera pasado nada. Adentro, eso tiene una traducción visual: los espejos que sostienen todo lo relacionado a Quidditch reflejan dorado, cálido. El resto de la estructura —lo que protege lo que de verdad importa, incluido lo que yo mismo enterré ahí— es frío, o directamente iridiscente. Cambia de color según el ángulo. Aprendí a usar ese color como indicador rápido, antes de meterme en detalle.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—¿Nada se le escapa?</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Una cosa. Cuando vuela, no hay nada de esto. Ningún corte, ningún desvío. Es lo único que tiene sin blindar. Todavía no sé si eso es una debilidad o una puerta, pero no es ruido. Es información.</p></div>
+
+          <p class="story-narration">Avery se quedó en silencio un momento, dejando que el fuego de la chimenea llenara el hueco.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—¿Por qué mentirle, entonces? —preguntó al fin, con una calma que no invitaba a evasivas—. Un chico que no sabe lo que es no sirve para nada.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Sirve exactamente porque no sabe. Hay dos razones, y no una sola. La primera es la de siempre, la de fondo: si lo que tapé esa noche llega a destaparse solo, si él alguna vez recupera lo que en realidad pasó en ese prado, deja de ser un chico traumatizado y pasa a ser un testigo. Y un testigo, con lo que sabe, me señala directo a mí.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—¿Y la segunda?</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Se agregó después, en tercer año, cuando entendí qué eran los espejos. Si él llegara a comprender el mecanismo —no la sospecha, la comprensión real— tiene capacidad de desbloquear estructuras que ya existen en esa mente y no están activas todavía. El entendimiento mismo es la activación. Así que ahora hay dos razones superpuestas para mantenerlo a ciegas, y a esta altura ya ni me molesto en distinguir cuál pesa más. Las dos apuntan al mismo lugar: mientras no entienda nada, tengo control. El día que entienda cualquiera de las dos cosas, lo pierdo.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—¿Y para qué lo querés, Shacklebolt? Porque hasta ahora me contaste un problema muy bien administrado. No un plan.</p></div>
+
+          <p class="story-narration">Ahí, por primera vez, Aurelio sonrió. Apenas.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—Vengo investigando aplicación de núcleos de varita a partir de estructuras mentales inusuales. Eso es Núcleos de Sangre, en la práctica — lo que el proyecto necesitaba desde el principio y nunca tuvo: un sujeto real, no teoría de manuscrito. Lo que tiene ese chico adentro es exactamente el tipo de material que necesito. No hablo de él como aliado. Hablo de él como recurso. Un arma que todavía no sabe que lo es, y que ni siquiera sabe que ya fue víctima mía una vez.</p></div>
+
+          <div class="story-dialogue-block"><p class="story-dialogue story-dialogue--aurelio">—Hay algo más —agregó, antes de que Avery pudiera cortar—. Reciente. Todavía no lo metí en ningún informe oficial, ni pienso hacerlo hasta entender qué es. Después de lo de la mansión, entré a revisar y encontré algo en el centro de su estructura que no tiene nombre en ningún sistema que yo conozca. Una masa sin forma fija, oscura, sin reflejo, fría de una manera particular.</p></div>
+
+          <p class="story-narration">El retrato de la joven junto a la chimenea no se movió — los retratos nunca se mueven cuando alguien más los mira — pero Aurelio sintió, por un segundo, que el silencio de Avery pesaba distinto que un momento antes.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--aurelio">Aurelio</span><p class="story-dialogue story-dialogue--aurelio">—No sé qué es —terminó, sin bajar la voz ni suavizarla—. Pero reconozco una firma útil cuando la tengo enfrente, y esta lo es. Quería que lo supieras antes que nadie. Si es lo que creo que es, cambia los números de todo lo que venís por armar.</p></div>
+
+          <p class="story-narration">Avery se puso de pie, caminó hasta la chimenea y se quedó ahí un momento, de espaldas, mirando el fuego que Aurelio había estado usando de excusa toda la conversación para no sostenerle la mirada. La reunión, entendió Aurelio, había terminado exactamente cuando Avery decidió que terminara, ni un segundo antes.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--avery">Elian Avery</span><p class="story-dialogue story-dialogue--avery">—Vas a seguir revisándolo —dijo, sin que sonara a pedido—. Y me vas a mantener al tanto de esa masa antes que a nadie.</p></div>
+
+          <p class="story-narration">Aurelio asintió, se puso de pie también, y salió por donde había entrado — pasando otra vez frente al retrato, sin mirarlo esta vez.</p>
+  </div>
+
+  <a class="story-cta" href="https://olivernodescansa.github.io/sesiones-a-shacklebolt/" target="_blank" rel="noopener">
+    <span class="story-cta-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+    </span>
+    <span class="story-cta-label" data-text="Registros del ministerio sobre Oliver Wood">Registros del ministerio sobre Oliver Wood</span>
+    <span class="story-cta-arrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
+    </span>
+  </a>
+</article>
+
+<div class="footer">
+  <p class="footer-text">
+    © 2026 Overload: Venom and Glass.<br>
+    Written by @wood_no_descansa · @fokinoliverwood
+  </p>
+  <div class="socials">
+    <a href="https://www.instagram.com/wood_no_descansa/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a href="https://x.com/fokinoliverwood" target="_blank" rel="noopener" aria-label="X">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4l16 16M20 4L4 20"/></svg>
+    </a>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var fwd = document.getElementById('video-forward');
+    var rev = document.getElementById('video-reverse');
+    if(!fwd || !rev) return;
+
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      rev.remove();
+      fwd.loop = true;
+      return;
+    }
+
+    var showingForward = true;
+
+    function swapTo(showFwd){
+      showingForward = showFwd;
+      var active = showFwd ? fwd : rev;
+      var inactive = showFwd ? rev : fwd;
+      active.currentTime = 0;
+      active.style.opacity = '1';
+      inactive.style.opacity = '0';
+      var p = active.play();
+      if(p && p.catch) p.catch(function(){});
+      inactive.pause();
+    }
+
+    fwd.addEventListener('ended', function(){ swapTo(false); });
+    rev.addEventListener('ended', function(){ swapTo(true); });
+  })();
+</script>
+
+</body>
+</html>

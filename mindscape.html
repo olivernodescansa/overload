@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inside the Mindscape — Overload: Venom and Glass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+SC:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @font-face{
+    font-family:'Doctor Glitch';
+    src: url('Doctor_Glitch.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root{
+    --bg:#040308;
+    --bg-panel:#0a0714;
+    --violet:#8b6bf0;
+    --violet-deep:#4c2f9e;
+    --cyan:#3fd7d0;
+    --text:#eae7f5;
+    --text-dim:#8c86a6;
+    --line: rgba(139,107,240,0.28);
+    --line-soft: rgba(139,107,240,0.14);
+    --ease-out: cubic-bezier(0.19,1,0.22,1);
+    --ease-out-cubic: cubic-bezier(0.215,0.61,0.355,1);
+    --ease-in-out: cubic-bezier(0.645,0.045,0.355,1);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  html{
+    scroll-behavior:smooth;
+  }
+
+  ::selection{ background:var(--violet-deep); color:#fff; }
+
+  /* ---------- SCROLLBAR ---------- */
+  html{
+    scrollbar-width: thin;
+    scrollbar-color: var(--violet) var(--bg);
+  }
+  ::-webkit-scrollbar{
+    width:11px;
+    height:11px;
+  }
+  ::-webkit-scrollbar-track{
+    background: var(--bg);
+    border-left:1px solid var(--line-soft);
+  }
+  ::-webkit-scrollbar-thumb{
+    background: linear-gradient(180deg, var(--violet) 0%, var(--violet-deep) 100%);
+    border-radius:0;
+    border:2px solid var(--bg);
+    box-shadow: inset 0 0 6px rgba(63,215,208,0.25);
+  }
+  ::-webkit-scrollbar-thumb:hover{
+    background: linear-gradient(180deg, var(--cyan) 0%, var(--violet) 100%);
+  }
+  ::-webkit-scrollbar-corner{
+    background: var(--bg);
+  }
+
+  /* ---------- HERO / VIDEO BG ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: clamp(32px, 6vh, 72px) 24px 40px;
+    overflow:hidden;
+    background: var(--bg);
+  }
+
+  .bg-video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter: saturate(1.25) contrast(1.12) brightness(0.85);
+    z-index:0;
+    transition: opacity 100ms linear;
+  }
+
+  .bg-scrim{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:
+      radial-gradient(ellipse 78% 62% at 50% 30%, rgba(10,7,20,0.05) 0%, rgba(4,3,8,0.28) 55%, rgba(4,3,8,0.68) 100%),
+      linear-gradient(180deg, rgba(4,3,8,0.25) 0%, rgba(4,3,8,0.08) 26%, rgba(4,3,8,0.55) 78%, var(--bg) 100%);
+  }
+
+  .noise{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- MAIN (centers between header space and footer) ---------- */
+  .page-main{
+    position:relative;
+    z-index:3;
+    flex:1 1 auto;
+    width:100%;
+    max-width:820px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:34px;
+  }
+
+  .page-eyebrow{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:clamp(1.4rem, 3vw, 1.9rem);
+    color:var(--violet);
+    text-shadow:0 0 24px rgba(139,107,240,0.5);
+    margin:0;
+  }
+
+  .page-title{
+    font-family:'Doctor Glitch', 'Playfair Display', serif;
+    font-weight:400;
+    font-size:clamp(2.6rem, 9vw, 5.6rem);
+    line-height:0.95;
+    letter-spacing:0.01em;
+    margin:0;
+    position:relative;
+    color:#f2f0fa;
+    text-shadow: 0 4px 30px rgba(4,3,8,0.9);
+  }
+
+  .page-title::before,
+  .page-title::after{
+    content: attr(data-text);
+    position:absolute;
+    inset:0;
+    background:transparent;
+  }
+  .page-title::before{
+    color:var(--cyan);
+    text-shadow: 0 0 26px rgba(63,215,208,0.55);
+    animation: pg-glitch-1 4.6s var(--ease-in-out) infinite;
+    clip-path: inset(0 0 55% 0);
+    mix-blend-mode: screen;
+    opacity:0;
+  }
+  .page-title::after{
+    color:var(--violet);
+    text-shadow: 0 0 26px rgba(139,107,240,0.55);
+    animation: pg-glitch-2 4.6s var(--ease-in-out) infinite;
+    clip-path: inset(60% 0 0 0);
+    mix-blend-mode: screen;
+    opacity:0;
+  }
+  @keyframes pg-glitch-1{
+    0%, 80%, 100% { transform:translate(0,0); clip-path: inset(0 0 55% 0); opacity:0; }
+    81% { transform:translate(-6px,-2px); clip-path: inset(8% 0 42% 0); opacity:0.9; }
+    84% { transform:translate(4px,1px); clip-path: inset(0 0 68% 0); opacity:0.6; }
+    87% { transform:translate(-3px,0); clip-path: inset(20% 0 25% 0); opacity:0.8; }
+    90% { transform:translate(0,0); opacity:0; }
+  }
+  @keyframes pg-glitch-2{
+    0%, 82%, 100% { transform:translate(0,0); clip-path: inset(60% 0 0 0); opacity:0; }
+    83% { transform:translate(6px,2px); clip-path: inset(35% 0 0 0); opacity:0.85; }
+    86% { transform:translate(-4px,-1px); clip-path: inset(72% 0 0 0); opacity:0.55; }
+    89% { transform:translate(3px,0); clip-path: inset(50% 0 0 0); opacity:0.75; }
+    92% { transform:translate(0,0); opacity:0; }
+  }
+
+  .page-sub{
+    font-family:'Cormorant SC', serif;
+    font-weight:500;
+    font-size:clamp(0.95rem, 2vw, 1.15rem);
+    letter-spacing:0.16em;
+    color:var(--text-dim);
+    margin:0;
+  }
+
+  /* ---------- SCROLL CUE ---------- */
+  .scroll-cue{
+    position:absolute;
+    left:50%;
+    bottom: clamp(20px, 4vh, 40px);
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    color: var(--text-dim);
+    transform:translateX(-50%);
+    transition: color 200ms ease;
+    animation: scroll-cue-bounce 2.2s ease-in-out infinite;
+  }
+  .scroll-cue:hover, .scroll-cue:focus-visible{
+    color: var(--violet);
+  }
+  .scroll-cue svg{ width:22px; height:22px; display:block; }
+  .scroll-cue:focus-visible{ outline:2px solid var(--cyan); outline-offset:4px; }
+
+  @keyframes scroll-cue-bounce{
+    0%, 100% { transform:translate(-50%, 0); }
+    50%      { transform:translate(-50%, 8px); }
+  }
+
+  /* ---------- BACK BUTTON (same bracket + glitch language as the index rows) ---------- */
+  .back-btn{
+    all:unset;
+    position:fixed;
+    top: clamp(18px, 4vh, 32px);
+    left: clamp(18px, 4vw, 32px);
+    z-index:6;
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 22px;
+    cursor:pointer;
+    box-sizing:border-box;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:500;
+    font-size:0.85rem;
+    letter-spacing:0.06em;
+    color:var(--text);
+  }
+  .back-btn::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    opacity:0;
+    transition: opacity 200ms ease;
+  }
+  .back-btn::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:0;
+    bottom:0;
+    width:16px;
+    height:16px;
+    opacity:0;
+    transition: opacity 200ms ease 40ms;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+  }
+  .back-btn:hover::before, .back-btn:focus-visible::before,
+  .back-btn:hover::after, .back-btn:focus-visible::after{
+    opacity:1;
+  }
+  .back-btn:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
+
+  .back-chevron{
+    position:relative; z-index:1;
+    width:8px; height:8px;
+    border-left:1.5px solid var(--text-dim);
+    border-bottom:1.5px solid var(--text-dim);
+    transform:rotate(45deg);
+    transition: transform 220ms var(--ease-out-cubic), border-color 200ms ease;
+    flex-shrink:0;
+  }
+  .back-btn:hover .back-chevron{ border-color:var(--violet); transform:rotate(45deg) translate(-2px,2px); }
+
+  .back-label{ position:relative; z-index:1; }
+  .back-label::before,
+  .back-label::after{
+    content: attr(data-text);
+    position:absolute;
+    z-index:2;
+    left:0; top:0;
+    width:100%;
+    white-space:nowrap;
+    pointer-events:none;
+    opacity:0;
+  }
+  .back-label::before{ color:var(--violet); text-shadow:0 0 14px rgba(139,107,240,0.65); }
+  .back-label::after{ color:var(--cyan); text-shadow:0 0 14px rgba(63,215,208,0.6); }
+  .back-btn:is(:hover,:focus-visible) .back-label::before{ animation: pg-row-glitch-violet 640ms steps(1) 1; }
+  .back-btn:is(:hover,:focus-visible) .back-label::after{ animation: pg-row-glitch-cyan 640ms steps(1) 1; }
+
+  @keyframes pg-row-glitch-violet{
+    0%   { clip-path: inset(0 0 88% 0);  transform:translate(0,0);    opacity:0; }
+    7%   { clip-path: inset(0 0 58% 0);  transform:translate(-4px,0); opacity:0.9; }
+    15%  { clip-path: inset(28% 0 42% 0); transform:translate(3px,0); opacity:0.65; }
+    23%  { clip-path: inset(0 0 74% 0);  transform:translate(-3px,0); opacity:0.85; }
+    31%  { clip-path: inset(52% 0 8% 0); transform:translate(4px,0);  opacity:0.55; }
+    40%  { clip-path: inset(0 0 88% 0);  transform:translate(0,0);    opacity:0; }
+    100% { opacity:0; }
+  }
+  @keyframes pg-row-glitch-cyan{
+    0%   { clip-path: inset(88% 0 0 0); transform:translate(0,0);     opacity:0; }
+    9%   { clip-path: inset(48% 0 0 0); transform:translate(4px,0);   opacity:0.85; }
+    17%  { clip-path: inset(18% 0 46% 0); transform:translate(-3px,0); opacity:0.6; }
+    25%  { clip-path: inset(58% 0 0 0); transform:translate(3px,0);   opacity:0.8; }
+    33%  { clip-path: inset(8% 0 60% 0); transform:translate(-4px,0);  opacity:0.5; }
+    42%  { clip-path: inset(88% 0 0 0); transform:translate(0,0);     opacity:0; }
+    100% { opacity:0; }
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer{
+    position:relative;
+    z-index:3;
+    margin:44px auto 0;
+    padding:0 24px 48px;
+    width:100%;
+    max-width:760px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+  }
+  .footer-text{
+    text-align:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(140,134,166,0.6);
+    line-height:1.9;
+  }
+  .footer-text a{
+    color:rgba(140,134,166,0.85);
+    text-decoration:none;
+    border-bottom:1px solid rgba(139,107,240,0.3);
+    transition: color 180ms ease, border-color 180ms ease;
+  }
+  .footer-text a:hover, .footer-text a:focus-visible{
+    color:var(--violet);
+    border-color:var(--violet);
+  }
+  .socials{ display:flex; gap:20px; }
+  .socials a{
+    color:var(--text-dim);
+    transition: color 180ms ease, transform 180ms var(--ease-out-cubic);
+    display:flex;
+  }
+  .socials a:hover{ color:var(--violet); transform:translateY(-2px); }
+  .socials svg{ width:17px; height:17px; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .page-title::before, .page-title::after,
+    .back-label::before, .back-label::after,
+    .back-chevron,
+    .scroll-cue,
+    .mirror-card{ animation:none; transition:none; }
+  }
+
+  /* ---------- STORY / READING SECTION ---------- */
+  .story-section{
+    position:relative;
+    z-index:1;
+    background: var(--bg);
+    padding: clamp(56px, 9vh, 96px) 24px 8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .story-content{
+    width:100%;
+    max-width:680px;
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.15rem;
+    line-height:1.85;
+    color:var(--text-dim);
+  }
+
+  .story-lede{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:1.5rem;
+    color:var(--text);
+    text-align:center;
+    margin:0 0 44px;
+  }
+
+  .story-narration{
+    margin:0 0 24px;
+  }
+
+  .story-dialogue-block{
+    margin:0 0 24px;
+  }
+  .story-speaker{
+    display:block;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.66rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .story-speaker--oliver{ color:var(--cyan); }
+  .story-speaker--tabatha{ color:var(--violet); }
+
+  .story-dialogue{
+    margin:0;
+    padding-left:18px;
+    border-left:2px solid var(--line);
+    color:var(--text);
+    font-size:1.18rem;
+  }
+  .story-dialogue--oliver{ border-left-color:var(--cyan); }
+  .story-dialogue--tabatha{ border-left-color:var(--violet); }
+
+  /* ---------- MIRROR CAROUSEL ---------- */
+  .mirror-section{
+    width:100%;
+    max-width:1000px;
+    margin:0 auto 8px;
+  }
+  .mirror-section-heading{
+    text-align:center;
+    font-family:'Cormorant SC', serif;
+    font-weight:500;
+    font-size:1rem;
+    letter-spacing:0.12em;
+    color:var(--text-dim);
+    margin:0 0 28px;
+  }
+
+  .mirror-carousel{
+    display:flex;
+    gap:16px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding:6px 4px 22px;
+    margin:0 -4px;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .mirror-card{
+    all:unset;
+    position:relative;
+    flex:0 0 208px;
+    scroll-snap-align:start;
+    box-sizing:border-box;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+    cursor:pointer;
+    transition: transform 220ms var(--ease-out-cubic), border-color 200ms ease;
+  }
+  .mirror-card::after{
+    content:"";
+    position:absolute;
+    z-index:2;
+    right:0; bottom:0;
+    width:16px; height:16px;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+    opacity:0;
+    transition: opacity 200ms ease;
+  }
+  .mirror-card:not([disabled]):hover{
+    transform:translateY(-4px);
+    border-color:var(--violet);
+  }
+  .mirror-card:not([disabled]):hover::after,
+  .mirror-card.is-active::after{
+    opacity:1;
+  }
+  .mirror-card.is-active{
+    border-color:var(--violet);
+  }
+  .mirror-card:focus-visible{
+    outline:2px solid var(--cyan);
+    outline-offset:2px;
+  }
+  .mirror-card[disabled]{
+    cursor:not-allowed;
+  }
+
+  .mirror-card-image{
+    display:block;
+    width:100%;
+    aspect-ratio:3/4;
+    background-image:url('glass-bg.png');
+    background-size:cover;
+    background-position:center;
+    filter:saturate(1.15) contrast(1.08) brightness(0.9);
+  }
+  .mirror-card[disabled] .mirror-card-image{
+    filter:grayscale(1) brightness(0.5) contrast(0.95);
+  }
+
+  .mirror-card-video{
+    display:block;
+    width:100%;
+    aspect-ratio:3/4;
+    object-fit:cover;
+    filter:saturate(1.15) contrast(1.08) brightness(0.9);
+  }
+  .mirror-card[disabled] .mirror-card-video{
+    filter:grayscale(1) brightness(0.5) contrast(0.95);
+  }
+
+  .mirror-card-body{
+    display:block;
+    position:relative;
+    z-index:1;
+    padding:14px 14px 16px;
+    text-align:left;
+  }
+  .mirror-card[disabled] .mirror-card-body{
+    opacity:0.55;
+  }
+  .mirror-card-title{
+    display:block;
+    position:relative;
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:1.08rem;
+    color:var(--text);
+    margin:0 0 8px;
+    line-height:1.2;
+  }
+  .mirror-card-date{
+    display:block;
+    position:relative;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.7rem;
+    letter-spacing:0.04em;
+    color:var(--text-dim);
+  }
+
+  .mirror-card-title::before,
+  .mirror-card-title::after,
+  .mirror-card-date::before,
+  .mirror-card-date::after{
+    content: attr(data-text);
+    position:absolute;
+    z-index:2;
+    left:0; top:0;
+    width:100%;
+    pointer-events:none;
+    opacity:0;
+  }
+  .mirror-card-title::before,
+  .mirror-card-date::before{
+    color:var(--violet);
+    text-shadow:0 0 14px rgba(139,107,240,0.65);
+  }
+  .mirror-card-title::after,
+  .mirror-card-date::after{
+    color:var(--cyan);
+    text-shadow:0 0 14px rgba(63,215,208,0.6);
+  }
+  .mirror-card:not([disabled]):hover .mirror-card-title::before,
+  .mirror-card:not([disabled]):hover .mirror-card-date::before{
+    animation: pg-row-glitch-violet 640ms steps(1) 1;
+  }
+  .mirror-card:not([disabled]):hover .mirror-card-title::after,
+  .mirror-card:not([disabled]):hover .mirror-card-date::after{
+    animation: pg-row-glitch-cyan 640ms steps(1) 1;
+  }
+
+  .mirror-pill{
+    position:absolute;
+    z-index:2;
+    top:10px;
+    left:10px;
+    background:var(--violet-deep);
+    color:#f2f0fa;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.58rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:5px 9px;
+    border:1px solid var(--violet);
+  }
+
+  /* ---------- MIRROR READER ---------- */
+  .mirror-reader{
+    position:relative;
+    width:100%;
+    max-width:680px;
+    margin:8px auto 0;
+    padding:26px 26px 28px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+  }
+  .mirror-reader::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:0; bottom:0;
+    width:16px; height:16px;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+  }
+  .mirror-reader-placeholder{
+    position:relative; z-index:1;
+    margin:0;
+    text-align:center;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:1.05rem;
+    color:var(--text-dim);
+    padding:20px 0;
+  }
+  .mirror-reader-content{
+    position:relative; z-index:1;
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.15rem;
+    line-height:1.85;
+    color:var(--text-dim);
+  }
+  .mirror-reader-eyebrow{
+    display:block;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.66rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--violet);
+    margin-bottom:8px;
+  }
+  .mirror-reader-title{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:1.4rem;
+    color:var(--text);
+    margin:0 0 18px;
+  }
+
+  @media (max-width: 560px){
+    .story-content{ font-size:1.05rem; }
+    .story-lede{ font-size:1.3rem; }
+    .mirror-card{ flex-basis:172px; }
+    .mirror-reader{ padding:20px 18px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <video class="bg-video" id="video-forward" autoplay muted playsinline preload="auto">
+    <source src="mindscape.mp4" type="video/mp4">
+  </video>
+  <video class="bg-video" id="video-reverse" muted playsinline preload="auto" style="opacity:0;">
+    <source src="mindscape-reverse.mp4" type="video/mp4">
+  </video>
+  <div class="bg-scrim"></div>
+  <div class="noise"></div>
+
+    <a class="back-btn" href="index.html">
+      <span class="back-chevron"></span>
+      <span class="back-label" data-text="Volver al índice">Volver al índice</span>
+    </a>
+
+  <main class="page-main">
+    <p class="page-eyebrow">IV.</p>
+    <h1 class="page-title" data-text="Inside the Mindscape">Inside the Mindscape</h1>
+    <p class="page-sub">Overload: Venom and Glass</p>
+  </main>
+
+  <a class="scroll-cue" href="#story" aria-label="Desplazarse para leer el capítulo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </a>
+</div>
+
+<article class="story-section" id="story">
+  <div class="story-content">
+    <p class="story-lede">Cartografía del mindscape</p>
+  </div>
+
+  <section class="mirror-section" aria-label="Capa de mapa — espejos del mindscape">
+    <p class="mirror-section-heading">Cada espejo se abre en su fecha. Tocá uno abierto para leer lo que guarda.</p>
+    <div class="mirror-carousel" role="list">
+          <button type="button" class="mirror-card" id="mirror-card-01" data-mirror="01" data-release="2026-09-01" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <video class="mirror-card-video" src="mirror-eye.mp4" autoplay muted loop playsinline aria-hidden="true"></video>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Unsealed</span>
+              <span class="mirror-card-date">01/09/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-02" data-mirror="02" data-release="2026-09-08" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Silent Company</span>
+              <span class="mirror-card-date">08/09/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-03" data-mirror="03" data-release="2026-09-15" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Solo Flight</span>
+              <span class="mirror-card-date">15/09/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-04" data-mirror="04" data-release="2026-09-22" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">First Departure</span>
+              <span class="mirror-card-date">22/09/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-05" data-mirror="05" data-release="2026-09-29" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Cold Stone</span>
+              <span class="mirror-card-date">29/09/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-06" data-mirror="06" data-release="2026-10-06" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Glasswork</span>
+              <span class="mirror-card-date">06/10/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-07" data-mirror="07" data-release="2026-10-13" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Silver Mist</span>
+              <span class="mirror-card-date">13/10/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-08" data-mirror="08" data-release="2026-10-20" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Unsent</span>
+              <span class="mirror-card-date">20/10/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-09" data-mirror="09" data-release="2026-10-27" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Empty</span>
+              <span class="mirror-card-date">27/10/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-10" data-mirror="10" data-release="" disabled>
+            <span class="mirror-pill">Not a mirror</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Venom</span>
+              <span class="mirror-card-date">—</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-11" data-mirror="11" data-release="2026-11-03" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">Taken</span>
+              <span class="mirror-card-date">03/11/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-12" data-mirror="12" data-release="2026-11-10" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">The Ring</span>
+              <span class="mirror-card-date">10/11/2026</span>
+            </span>
+          </button>
+
+          <button type="button" class="mirror-card" id="mirror-card-13" data-mirror="13" data-release="2026-11-17" disabled>
+            <span class="mirror-pill">This mirror opens soon</span>
+            <span class="mirror-card-image" aria-hidden="true"></span>
+            <span class="mirror-card-body">
+              <span class="mirror-card-title">White Noise</span>
+              <span class="mirror-card-date">17/11/2026</span>
+            </span>
+          </button>
+    </div>
+  </section>
+
+  <div class="mirror-reader" id="mirror-reader">
+    <p class="mirror-reader-placeholder">Elegí un espejo abierto para leer lo que guarda.</p>
+      <div class="mirror-reader-content" data-mirror-content="01" hidden>
+        <span class="mirror-reader-eyebrow">Capa 01 — El tío / Godric's Hollow</span>
+        <h3 class="mirror-reader-title">Unsealed</h3>
+          <p class="story-narration">La aparición los dejó a dos cuadras del pueblo. Más cerca no se podía: había wards antiguos protegiendo Godric&#x27;s Hollow, del tipo que ni el Ministerio se molestaba en actualizar porque nadie que perteneciera ahí necesitaba entrar más rápido de lo que permitía caminar.</p>
+
+          <p class="story-narration">Oliver caminó con las manos en los bolsillos, todavía con el uniforme de Quidditch puesto, como si hubiera salido directo del entrenamiento sin darse tiempo a cambiarse ni a pensarlo dos veces. El pueblo estaba tranquilo, como siempre. Nadie que lo viera pasar —otro chico más, con el pelo revuelto y las mejillas todavía coloradas por el frío del aire— habría imaginado que estaba a punto de abrir la puerta más pesada que tenía.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Es acá —dijo, con la vista cansada, mirando un campo que a cualquier otro le habría parecido exactamente eso: un campo. Pasto, un par de árboles viejos, el cielo empezando a bajar el sol.</p></div>
+
+          <p class="story-narration">Se paró frente a él como quien se para frente a algo que lleva diez años evitando mirar de frente.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Acá fue. Con mi tío. Tenía siete años.</p></div>
+
+          <p class="story-narration">La voz se le trabó en algún punto de la frase, y no la forzó. Dejó que el silencio hiciera lo que tenía que hacer, mientras Tabatha esperaba a su lado sin apurarlo.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—¿Puedo confiar en vos? Sin importar qué.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--tabatha">Tabatha</span><p class="story-dialogue story-dialogue--tabatha">—Podés —dijo ella, sin dudar, sosteniéndole la mirada—. Pase lo que pase.</p></div>
+
+          <p class="story-narration">Se detuvo a mirarla un momento más, cerró los ojos, se frotó las sienes. Cuando los volvió a abrir, se veían un poco más claros de lo normal — el gris que tomaban cuando bajaba la guardia de verdad, no la que mostraba en los pasillos de Hogwarts.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Te puedo contar con palabras, Tabbie, y algo vas a entender. Pero las palabras pasan por mí primero, y yo... filtro. No es a propósito. Es que no sé hacerlo de otra forma. —Tragó saliva—. ¿Sabés lo que es la Legeremancia?</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--tabatha">Tabatha</span><p class="story-dialogue story-dialogue--tabatha">—Algo sé —respondió Tabatha, apretando los labios un momento antes de seguir—. Lo suficiente para saber que no es algo que se hace a la ligera.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Quiero que lo veas vos. Directamente. Sin que yo esté en el medio arruinándolo. —Volvió a tragar—. Hacé Legeremancia. Ahora. Antes de que me arrepienta. No puedo bajar los muros mucho tiempo. Sé lo que hago. No hace falta que yo esté ahí. Ya lo vas a entender.</p></div>
+
+          <p class="story-narration">Soltó el aire que había estado conteniendo.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Hacelo.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--tabatha">Tabatha</span><p class="story-dialogue story-dialogue--tabatha">—Bien —dijo Tabatha, en voz baja, más para sí misma que para él, y cerró los ojos un segundo antes de levantar la varita—. ¡Legeremens!</p></div>
+
+          <p class="story-narration">No fue como entrar a una habitación. Fue como caer en algo que no tenía piso fijo.</p>
+
+          <p class="story-narration">Lo primero que Tabatha encontró fueron espejos. Muchos. Pasillos enteros de espejos, uno atrás del otro, como si alguien hubiera construido un castillo entero con la única intención de que nadie encontrara la salida. Cada superficie devolvía un reflejo — pero no el de ella. El reflejo de lo que Oliver quería que se viera desde afuera: un chico sonriendo, dando indicaciones tácticas, bromeando, funcionando.</p>
+
+          <p class="story-narration">Los pasillos se repetían. Espejo, espejo, espejo. Era agotador, era hermoso, era exactamente lo que parecía: una defensa construida con tanto cuidado que ni el que la había hecho se acordaba ya dónde había puesto las puertas de verdad.</p>
+
+          <p class="story-narration">Pero había algunos espejos que no reflejaban.</p>
+
+          <p class="story-narration">Se notaban distintos apenas se los miraba de cerca — el vidrio tenía una textura rara, como agua quieta en vez de superficie dura. Esos eran los que Oliver había bajado a propósito, los que había dejado sin sellar para esto.</p>
+
+          <p class="story-narration">En uno: un campo, visto desde la altura de un chico muy chico. Pasto que llegaba casi a la cintura. Una escoba vieja, prestada, más grande que él. Una risa —no la de Oliver, la del tío, grave, cálida— y la sensación física, casi vertiginosa, de que el suelo se alejaba y por primera vez el mundo parecía seguro.</p>
+
+          <p class="story-narration">En otro, más adelante en el pasillo: el mismo campo, pero la luz había cambiado. Algo estaba mal antes de que se viera qué. El sonido llegaba primero — voces que no deberían haber estado ahí. Y después la escena se cortaba, literal, como si el vidrio se hubiera rajado justo antes de mostrar el resto, y del otro lado del rajón solo hubiera oscuridad y un ruido blanco, como estática, como un grito que el cristal había decidido no reproducir.</p>
+
+          <p class="story-narration">Cuando Tabatha insistió, cuando empujó un poco más ahí, el espejo no se rompió. Se empañó. Se defendió solo, sin que Oliver tuviera que hacer nada consciente. Era el reflejo de años de entrenamiento respondiendo antes que él.</p>
+
+          <p class="story-narration">Más adelante, otros espejos sin marco se dejaban entrever apenas: una carta jamás enviada. La primera vez que había volado solo, sin nadie mirando, y por un rato el vacío no había dolido. Livie, mucho más chica, sentada a su lado sin decir nada, simplemente estando — el único espejo del pasillo que tenía, apenas, algo de calor de fondo.</p>
+
+          <p class="story-narration">Y en algún punto, si se caminaba lo suficiente, aparecía uno último, más chico que los demás, casi escondido entre dos espejos gigantes que sí reflejaban. Ese mostraba algo simple: Oliver, ahora, esa misma tarde, parado en el campo real, decidiendo —por primera vez en mucho tiempo— dejar un espejo sin sellar a propósito. Para ella.</p>
+
+          <p class="story-narration">Fue justo entonces que todos los cristales volaron por los aires en un gran estallido, y una fuerza arrastró a Tabatha fuera de la mente de Oliver sin que pudiera apenas pelear contra ella. Fue rápido, punzante, determinante. La arrancó de raíz sin más.</p>
+
+          <p class="story-narration">Cuando volvió a enfocar la vista, Oliver estaba ahí. De pie. Respirando distinto de lo normal, como si hubiera corrido, aunque no se había movido.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—¿Viste el campo?</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--tabatha">Tabatha</span><p class="story-dialogue story-dialogue--tabatha">—Sí —susurró ella, todavía buscando el equilibrio, la voz apenas firme—. Oliver, eso...</p></div>
+
+          <p class="story-narration">No le preguntó qué había visto exactamente, ni la dejó terminar la frase. No hacía falta. Lo sabía, porque era exacto lo que había querido que viera.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Ese es todo el motivo. Ese campo. Es por eso que soy... así.</p></div>
+
+          <p class="story-narration">Señaló, vago, hacia sí mismo entero — como si &quot;así&quot; explicara los años, las paredes, el Quidditch como refugio, todo.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Te lo mostré porque quería que alguien entrara sin que yo estuviera parado en la puerta, filtrando lo que entra y lo que no.</p></div>
+
+          <p class="story-narration">Hizo una pausa.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Eso fue. Mi tío. Godric&#x27;s Hollow. Hace diez años. Nos encontraron Mortífagos. Buscaban información. Él no habló. Yo tampoco pude — tenía siete años, no sabía nada que decir. Usaron Legeremancia conmigo primero. Después con él. Lo mataron cuando terminaron.</p></div>
+
+          <p class="story-narration">Se encogió de hombros, como quien cierra un informe.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—La Orden decidió que la solución era enseñarme Oclumancia. A los siete. Por eso los espejos, Tabbie. Por eso todo es así adentro. —Hizo una pausa breve—. ¿Alguna vez leíste sobre cómo funciona? La Oclumancia, digo.</p></div>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--tabatha">Tabatha</span><p class="story-dialogue story-dialogue--tabatha">—Un poco —empezó a decir ella—, en un libro de la biblioteca de mi padre, pero nunca pensé que...</p></div>
+
+          <p class="story-narration">No esperó a que terminara. Siguió hablando, casi como si no la escuchara, como si la explicación llevara ya diez años pidiendo salir y solo hubiera encontrado la puerta esa tarde.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—El primer vuelo en escoba fue con mi tío. Es lo único de esa época que quedó entero. Todo lo demás lo tuve que blindar. —Apretó la mandíbula un segundo antes de seguir—. El recuerdo para mi Patronus es eso. Aprender a volar con él, en su flecha de plata.</p></div>
+
+          <p class="story-narration">Hizo una pausa antes de continuar.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Y no es que no sienta las cosas. Es peor que eso. Las siento del otro lado de un vidrio. Sé que están ahí. Las puedo nombrar, las puedo explicar con una precisión de mierda. Pero no las puedo habitar. No puedo enojarme como se enoja la gente de verdad. No puedo llorar como llora la gente de verdad. Todo me llega amortiguado, tarde... como un eco.</p></div>
+
+          <p class="story-narration">Se pasó una mano por la cara, un gesto que no era habitual en él. Miró hacia el campo, después volvió a ella, y asintió de nuevo, como si necesitara confirmarse algo a sí mismo.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Y eso me tiene podrido. Porque no elegí esto. Tenía siete años y alguien decidió por mí que era mejor no sentir a sentir mal. Y funcionó. Ese es el problema... funcionó demasiado bien.</p></div>
+
+          <div class="story-dialogue-block"><p class="story-dialogue story-dialogue--oliver">»Con Quidditch es distinto porque ahí no hay nada que proteger. Lo tenía antes de todo esto. No fue tocado. Entonces cuando vuelo, no hay vidrio en el medio. Estoy ahí, entero, sintiendo todo sin filtro, como se supone que tiene que sentirse cualquier cosa. Y después bajo de la escoba y se corta. Vuelvo a ser el de siempre.</p></div>
+
+          <p class="story-narration">Apretó los puños, los soltó.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Es la única prueba que tengo de que en algún lugar ahí adentro todavía queda algo que no está roto. Y me frustra no poder llevar eso a ningún otro lado de mi vida. Ni a vos. Ni a nadie.</p></div>
+
+          <p class="story-narration">Levantó la remera y sacó un cuchillo del elástico del pantalón.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Por eso necesitaba eso. Lo fuerte. El Quidditch, el dolor fuerte, lo que sea que me saque del cuerpo un segundo. Es lo único que encontré en diez años que funciona. Necesito que algo me pegue fuerte para poder sentir sin el vidrio en el medio.</p></div>
+
+          <p class="story-narration">La pausa que siguió fue más larga que las anteriores. Algo en su mandíbula se tensó distinto.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Y últimamente... no sé. Está peor.</p></div>
+
+          <p class="story-narration">Se aflojó, como si necesitara recuperar espacio antes de seguir.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—En cuanto siento algo fuerte de verdad, todo se cierra de golpe. Explota y se tapa en el mismo segundo, más rápido que antes, con más fuerza. Antes no era así. Era al revés.</p></div>
+
+          <div class="story-dialogue-block"><p class="story-dialogue story-dialogue--oliver">»Me frustra. Por eso intenté tirarme de la torre... por eso llevo esto y me hago algunos cortes a veces. Me frustra no sentir nada. Estoy vacío.</p></div>
+
+          <p class="story-narration">Se pasó la mano por la cara otra vez, un gesto tenso, distinto al de antes.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--oliver">Oliver</span><p class="story-dialogue story-dialogue--oliver">—Antes por lo menos tardaba un rato en cerrarse. Ahora ni eso. Es como si algo adentro decidiera solo que ya fue suficiente, y me apaga.</p></div>
+
+          <p class="story-narration">Miró el campo, evitando mirarla a ella.</p>
+
+          <div class="story-dialogue-block"><span class="story-speaker story-speaker--tabatha">Tabatha</span><p class="story-dialogue story-dialogue--tabatha">—Acá estoy —dijo Tabatha, simplemente, y no agregó nada más.</p></div>
+      </div>
+  </div>
+</article>
+
+<div class="footer">
+  <p class="footer-text">
+    © 2026 Overload: Venom and Glass.<br>
+    Written by @wood_no_descansa · @fokinoliverwood
+  </p>
+  <div class="socials">
+    <a href="https://www.instagram.com/wood_no_descansa/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a href="https://x.com/fokinoliverwood" target="_blank" rel="noopener" aria-label="X">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4l16 16M20 4L4 20"/></svg>
+    </a>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var fwd = document.getElementById('video-forward');
+    var rev = document.getElementById('video-reverse');
+    if(!fwd || !rev) return;
+
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      rev.remove();
+      fwd.loop = true;
+      return;
+    }
+
+    var showingForward = true;
+
+    function swapTo(showFwd){
+      showingForward = showFwd;
+      var active = showFwd ? fwd : rev;
+      var inactive = showFwd ? rev : fwd;
+      active.currentTime = 0;
+      active.style.opacity = '1';
+      inactive.style.opacity = '0';
+      var p = active.play();
+      if(p && p.catch) p.catch(function(){});
+      inactive.pause();
+    }
+
+    fwd.addEventListener('ended', function(){ swapTo(false); });
+    rev.addEventListener('ended', function(){ swapTo(true); });
+  })();
+
+  document.querySelectorAll('.mirror-card-title, .mirror-card-date').forEach(function(el){
+    el.setAttribute('data-text', el.textContent.trim());
+  });
+
+  // Mirror carousel: unlock cards whose release date has arrived (compared
+  // against the visitor's own clock), and let unlocked cards open their
+  // chapter in the reader panel below.
+  (function(){
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.mirror-card'));
+    if(!cards.length) return;
+
+    var today = new Date();
+    today.setHours(0,0,0,0);
+
+    cards.forEach(function(card){
+      var iso = card.getAttribute('data-release');
+      var pill = card.querySelector('.mirror-pill');
+      if(!iso){
+        // No release date at all (e.g. "El Veneno"): stays locked, not a countdown.
+        return;
+      }
+      var release = new Date(iso + 'T00:00:00');
+      if(release <= today){
+        card.removeAttribute('disabled');
+        if(pill) pill.remove();
+      }
+    });
+
+    var placeholder = document.querySelector('.mirror-reader-placeholder');
+    var reader = document.getElementById('mirror-reader');
+
+    cards.forEach(function(card){
+      card.addEventListener('click', function(){
+        if(card.hasAttribute('disabled')) return;
+
+        var id = card.getAttribute('data-mirror');
+
+        cards.forEach(function(c){ c.classList.remove('is-active'); });
+        card.classList.add('is-active');
+
+        document.querySelectorAll('.mirror-reader-content').forEach(function(panel){
+          panel.hidden = true;
+        });
+
+        var target = document.querySelector('.mirror-reader-content[data-mirror-content="' + id + '"]');
+        if(target){
+          target.hidden = false;
+          if(placeholder) placeholder.hidden = true;
+        } else if(placeholder){
+          placeholder.hidden = false;
+          placeholder.textContent = 'Este espejo ya está abierto, pero el capítulo todavía se está terminando de escribir.';
+        }
+
+        reader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

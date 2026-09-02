@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Overload: Venom and Glass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+SC:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @font-face{
+    font-family:'Doctor Glitch';
+    src: url('Doctor_Glitch.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root{
+    --bg:#040308;
+    --bg-panel:#0a0714;
+    --violet:#8b6bf0;
+    --violet-deep:#4c2f9e;
+    --cyan:#3fd7d0;
+    --text:#eae7f5;
+    --text-dim:#8c86a6;
+    --line: rgba(139,107,240,0.28);
+    --line-soft: rgba(139,107,240,0.14);
+    --ease-out: cubic-bezier(0.19,1,0.22,1);
+    --ease-out-cubic: cubic-bezier(0.215,0.61,0.355,1);
+    --ease-in-out: cubic-bezier(0.645,0.045,0.355,1);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  ::selection{ background:var(--violet-deep); color:#fff; }
+
+  /* ---------- SCROLLBAR ---------- */
+  html{
+    scrollbar-width: thin;
+    scrollbar-color: var(--violet) var(--bg);
+  }
+  ::-webkit-scrollbar{
+    width:11px;
+    height:11px;
+  }
+  ::-webkit-scrollbar-track{
+    background: var(--bg);
+    border-left:1px solid var(--line-soft);
+  }
+  ::-webkit-scrollbar-thumb{
+    background: linear-gradient(180deg, var(--violet) 0%, var(--violet-deep) 100%);
+    border-radius:0;
+    border:2px solid var(--bg);
+    box-shadow: inset 0 0 6px rgba(63,215,208,0.25);
+  }
+  ::-webkit-scrollbar-thumb:hover{
+    background: linear-gradient(180deg, var(--cyan) 0%, var(--violet) 100%);
+  }
+  ::-webkit-scrollbar-corner{
+    background: var(--bg);
+  }
+
+  /* ---------- HERO / VIDEO BG ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding: clamp(48px, 8vh, 96px) 24px 64px;
+    overflow:hidden;
+    background: var(--bg);
+  }
+
+  .bg-video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter: saturate(1.25) contrast(1.12) brightness(0.85);
+    z-index:0;
+    transition: opacity 100ms linear;
+  }
+
+  .bg-scrim{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:
+      radial-gradient(ellipse 78% 62% at 50% 30%, rgba(10,7,20,0.05) 0%, rgba(4,3,8,0.28) 55%, rgba(4,3,8,0.68) 100%),
+      linear-gradient(180deg, rgba(4,3,8,0.25) 0%, rgba(4,3,8,0.08) 26%, rgba(4,3,8,0.55) 78%, var(--bg) 100%);
+  }
+
+  .noise{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .hero-content{
+    position:relative;
+    z-index:3;
+    width:100%;
+    max-width:920px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+
+  /* ---------- GLITCH TITLE ---------- */
+  .titleblock{ position:relative; }
+
+  .glitch-title{
+    font-family:'Doctor Glitch', 'Playfair Display', serif;
+    font-weight:400;
+    font-size:clamp(3.6rem, 13vw, 9.5rem);
+    line-height:0.9;
+    letter-spacing:0.02em;
+    margin:0;
+    position:relative;
+    color:#f2f0fa;
+    text-shadow: 0 4px 30px rgba(4,3,8,0.9);
+    animation: title-flicker 7s ease-in-out infinite;
+  }
+
+  /* Layer 1 (base, white) + layer 2 (violet) + layer 3 (cyan) = the type set three times */
+  .glitch-title::before,
+  .glitch-title::after{
+    content:"Overload";
+    position:absolute;
+    inset:0;
+    background:transparent;
+  }
+  .glitch-title::before{
+    color:var(--cyan);
+    text-shadow: 0 0 26px rgba(63,215,208,0.55);
+    animation: glitch-shift-1 4.4s var(--ease-in-out) infinite;
+    clip-path: inset(0 0 55% 0);
+    mix-blend-mode: screen;
+    opacity:0;
+  }
+  .glitch-title::after{
+    color:var(--violet);
+    text-shadow: 0 0 26px rgba(139,107,240,0.55);
+    animation: glitch-shift-2 4.4s var(--ease-in-out) infinite;
+    clip-path: inset(60% 0 0 0);
+    mix-blend-mode: screen;
+    opacity:0;
+  }
+
+  @keyframes glitch-shift-1{
+    0%, 78%, 100% { transform:translate(0,0); clip-path: inset(0 0 55% 0); opacity:0; }
+    79% { transform:translate(-7px,-2px); clip-path: inset(8% 0 42% 0); opacity:0.9; }
+    81% { transform:translate(5px,1px); clip-path: inset(0 0 68% 0); opacity:0.7; }
+    83% { transform:translate(-4px,0); clip-path: inset(20% 0 25% 0); opacity:0.85; }
+    85% { transform:translate(0,0); opacity:0; }
+    92% { transform:translate(0,0); clip-path: inset(0 0 55% 0); opacity:0; }
+    92.5% { transform:translate(-5px,1px); clip-path: inset(30% 0 10% 0); opacity:0.8; }
+    93.5% { transform:translate(0,0); opacity:0; }
+  }
+  @keyframes glitch-shift-2{
+    0%, 79%, 100% { transform:translate(0,0); clip-path: inset(60% 0 0 0); opacity:0; }
+    80% { transform:translate(7px,2px); clip-path: inset(35% 0 0 0); opacity:0.9; }
+    82% { transform:translate(-5px,-1px); clip-path: inset(72% 0 0 0); opacity:0.65; }
+    84% { transform:translate(4px,0); clip-path: inset(50% 0 0 0); opacity:0.8; }
+    86% { transform:translate(0,0); opacity:0; }
+    92% { transform:translate(0,0); clip-path: inset(60% 0 0 0); opacity:0; }
+    92.5% { transform:translate(5px,-1px); clip-path: inset(55% 0 15% 0); opacity:0.75; }
+    93.5% { transform:translate(0,0); opacity:0; }
+  }
+  @keyframes title-flicker{
+    0%, 78%, 100% { opacity:1; }
+    79% { opacity:0.75; }
+    80% { opacity:1; }
+    82% { opacity:0.9; }
+    84% { opacity:1; }
+    92.5% { opacity:0.88; }
+    93.5% { opacity:1; }
+  }
+
+  .subtitle{
+    font-family:'Cormorant SC', serif;
+    font-weight:500;
+    font-size:clamp(1.4rem, 4vw, 2.6rem);
+    letter-spacing:0.14em;
+    margin:6px 0 0;
+    color:var(--violet);
+    text-shadow:0 0 30px rgba(139,107,240,0.4);
+  }
+
+  .tagline{
+    margin-top:22px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.78rem;
+    letter-spacing:0.22em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+  }
+
+  .glyph{
+    margin: 26px 0 34px;
+    width:26px; height:26px;
+    opacity:0.85;
+    color:var(--violet);
+  }
+
+  /* ---------- CHAPTER LIST ---------- */
+  .chapters{
+    width:100%;
+    max-width:760px;
+    display:flex;
+    flex-direction:column;
+    border-top:1px solid var(--line);
+  }
+
+  .chapter{
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+
+  .chapter-trigger{
+    all:unset;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    width:100%;
+    padding:19px 14px;
+    cursor:pointer;
+    box-sizing:border-box;
+    position:relative;
+  }
+
+  .chapter-trigger:focus-visible{
+    outline:2px solid var(--cyan);
+    outline-offset:-2px;
+  }
+
+  .chapter-trigger::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:var(--bg-panel);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    opacity:0;
+    transition: opacity 200ms ease;
+  }
+  .chapter-trigger::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:0;
+    bottom:0;
+    width:16px;
+    height:16px;
+    opacity:0;
+    transition: opacity 200ms ease 40ms;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+  }
+  .chapter-trigger:hover::before,
+  .chapter-trigger:hover::after,
+  .chapter[data-open="true"] .chapter-trigger::before,
+  .chapter[data-open="true"] .chapter-trigger::after{
+    opacity:1;
+  }
+
+  .chapter-mark{
+    position:relative;
+    z-index:1;
+    flex-shrink:0;
+    width:34px;
+    text-align:center;
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:1.3rem;
+    color:var(--text-dim);
+    transition: color 200ms ease;
+  }
+  .chapter-mark svg{ width:19px; height:19px; display:block; margin:0 auto; }
+  .chapter-mark.numeral{ font-size:1.55rem; }
+
+  .chapter-label{
+    position:relative;
+    z-index:1;
+    flex:1;
+    text-align:left;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:500;
+    font-size:1rem;
+    letter-spacing:0.02em;
+    color:var(--text);
+    transition: color 200ms ease, transform 200ms var(--ease-out-cubic);
+  }
+
+  /* Glitch duplicate layers: the label text set twice more, in violet and cyan,
+     sliced into shifting bands — fires once each time a hover/focus begins. */
+  .chapter-label::before,
+  .chapter-label::after{
+    content: attr(data-text);
+    position:absolute;
+    z-index:2;
+    left:0;
+    top:0;
+    width:100%;
+    white-space:nowrap;
+    pointer-events:none;
+    opacity:0;
+  }
+  .chapter-label::before{
+    color:var(--violet);
+    text-shadow:0 0 14px rgba(139,107,240,0.65);
+  }
+  .chapter-label::after{
+    color:var(--cyan);
+    text-shadow:0 0 14px rgba(63,215,208,0.6);
+  }
+
+  .chapter-trigger:is(:hover,:focus-visible) .chapter-label::before{
+    animation: row-glitch-violet 640ms steps(1) 1;
+  }
+  .chapter-trigger:is(:hover,:focus-visible) .chapter-label::after{
+    animation: row-glitch-cyan 640ms steps(1) 1;
+  }
+  .chapter-trigger:is(:hover,:focus-visible) .chapter-mark{
+    animation: row-glitch-flicker 560ms steps(1) 1;
+  }
+
+  @keyframes row-glitch-violet{
+    0%   { clip-path: inset(0 0 88% 0);  transform:translate(0,0);     opacity:0; }
+    7%   { clip-path: inset(0 0 58% 0);  transform:translate(-4px,0);  opacity:0.9; }
+    15%  { clip-path: inset(28% 0 42% 0); transform:translate(3px,0);  opacity:0.65; }
+    23%  { clip-path: inset(0 0 74% 0);  transform:translate(-3px,0);  opacity:0.85; }
+    31%  { clip-path: inset(52% 0 8% 0); transform:translate(4px,0);   opacity:0.55; }
+    40%  { clip-path: inset(0 0 88% 0);  transform:translate(0,0);     opacity:0; }
+    100% { opacity:0; }
+  }
+  @keyframes row-glitch-cyan{
+    0%   { clip-path: inset(88% 0 0 0); transform:translate(0,0);     opacity:0; }
+    9%   { clip-path: inset(48% 0 0 0); transform:translate(4px,0);   opacity:0.85; }
+    17%  { clip-path: inset(18% 0 46% 0); transform:translate(-3px,0); opacity:0.6; }
+    25%  { clip-path: inset(58% 0 0 0); transform:translate(3px,0);   opacity:0.8; }
+    33%  { clip-path: inset(8% 0 60% 0); transform:translate(-4px,0);  opacity:0.5; }
+    42%  { clip-path: inset(88% 0 0 0); transform:translate(0,0);     opacity:0; }
+    100% { opacity:0; }
+  }
+  @keyframes row-glitch-flicker{
+    0%, 100% { opacity:1; }
+    12%  { opacity:0.35; }
+    22%  { opacity:1; }
+    50%  { opacity:0.55; }
+    58%  { opacity:1; }
+  }
+
+  .chapter-chevron{
+    position:relative;
+    z-index:1;
+    width:9px; height:9px;
+    border-right:1.5px solid var(--text-dim);
+    border-bottom:1.5px solid var(--text-dim);
+    transform:rotate(-45deg);
+    transition: transform 220ms var(--ease-out-cubic), border-color 200ms ease, margin 220ms var(--ease-out-cubic);
+    flex-shrink:0;
+  }
+
+  .chapter-trigger:hover .chapter-mark,
+  .chapter-trigger:hover .chapter-chevron{
+    color:var(--violet);
+    border-color:var(--violet);
+  }
+  .chapter-trigger:hover .chapter-label{ transform:translateX(4px); color:#fff; }
+  .chapter-trigger:hover .chapter-chevron{ transform:rotate(-45deg) translate(2px,-2px); }
+
+  .chapter[data-open="true"] .chapter-mark{ color:var(--violet); }
+  .chapter[data-open="true"] .chapter-label{ color:#fff; }
+  .chapter[data-open="true"] .chapter-chevron{
+    border-color:var(--violet);
+    transform:rotate(45deg);
+  }
+
+  .chapter-panel{
+    display:grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms var(--ease-in-out);
+  }
+  .chapter[data-open="true"] .chapter-panel{
+    grid-template-rows: 1fr;
+  }
+  .chapter-panel-inner{
+    overflow:hidden;
+  }
+  .chapter-panel-content{
+    position:relative;
+    z-index:1;
+    padding: 4px 24px 28px;
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.12rem;
+    line-height:1.6;
+    color:var(--text-dim);
+    text-align:center;
+    max-width:600px;
+    margin:0 auto;
+    opacity:0;
+    transform:translateY(-4px);
+    transition: opacity 260ms var(--ease-out) 60ms, transform 260ms var(--ease-out) 60ms;
+  }
+  .chapter[data-open="true"] .chapter-panel-content{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .chapter-panel-content em{
+    color:var(--violet);
+    font-style:italic;
+  }
+  .chapter-panel-content .edit-note{
+    display:block;
+    margin-top:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:rgba(140,134,166,0.55);
+  }
+
+  .chapter-panel-content--rich{
+    max-width:600px;
+  }
+  .chapter-panel-content p{
+    margin:0 0 14px;
+  }
+  .chapter-panel-content p:last-child,
+  .chapter-panel-content ul:last-child{
+    margin-bottom:0;
+  }
+  .chapter-panel-content strong{
+    color:var(--text);
+    font-weight:600;
+    font-style:normal;
+  }
+  .chapter-panel-content h4{
+    margin:24px 0 10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--violet);
+  }
+  .chapter-panel-content h4:first-child{
+    margin-top:0;
+  }
+  .chapter-panel-content ul{
+    margin:0 0 14px;
+    padding:0;
+    list-style:none;
+  }
+  .chapter-panel-content li{
+    padding:7px 0;
+    border-bottom:1px solid var(--line-soft);
+    font-size:1.02rem;
+  }
+  .chapter-panel-content li:last-child{
+    border-bottom:none;
+  }
+  .chapter-panel-content .inline-links{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:baseline;
+    gap:8px 14px;
+    font-size:1.02rem;
+  }
+  .chapter-panel-content .inline-links span{
+    color:var(--line);
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.7rem;
+  }
+  .chapter-panel-content a{
+    color:var(--cyan);
+    text-decoration:none;
+    border-bottom:1px solid rgba(63,215,208,0.35);
+    transition: color 180ms ease, border-color 180ms ease;
+  }
+  .chapter-panel-content a:hover,
+  .chapter-panel-content a:focus-visible{
+    color:#fff;
+    border-color:var(--cyan);
+  }
+
+  @media (hover:none) and (pointer:coarse){
+    .chapter-trigger:hover .chapter-label{ transform:none; }
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer{
+    margin-top:44px;
+    width:100%;
+    max-width:760px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+  }
+  .footer-text{
+    text-align:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(140,134,166,0.6);
+    line-height:1.9;
+  }
+  .footer-text a{
+    color:rgba(140,134,166,0.85);
+    text-decoration:none;
+    border-bottom:1px solid rgba(139,107,240,0.3);
+    transition: color 180ms ease, border-color 180ms ease;
+  }
+  .footer-text a:hover,
+  .footer-text a:focus-visible{
+    color:var(--violet);
+    border-color:var(--violet);
+  }
+  .socials{
+    display:flex;
+    gap:20px;
+  }
+  .socials a{
+    color:var(--text-dim);
+    transition: color 180ms ease, transform 180ms var(--ease-out-cubic);
+    display:flex;
+  }
+  .socials a:hover{ color:var(--violet); transform:translateY(-2px); }
+  .socials svg{ width:17px; height:17px; }
+
+  @media (prefers-reduced-motion: reduce){
+    .glitch-title, .glitch-title::before, .glitch-title::after{ animation:none; }
+    .chapter-label, .chapter-chevron, .chapter-trigger:hover .chapter-label,
+    .chapter-trigger:hover .chapter-chevron, .socials a{ transition:none; }
+    .chapter-panel{ transition:none; }
+    .chapter-panel-content{ transition:none; }
+    .chapter-trigger:is(:hover,:focus-visible) .chapter-label::before,
+    .chapter-trigger:is(:hover,:focus-visible) .chapter-label::after,
+    .chapter-trigger:is(:hover,:focus-visible) .chapter-mark{ animation:none; }
+  }
+
+  @media (max-width: 560px){
+    .chapter-trigger{ gap:12px; padding:16px 8px; }
+    .chapter-panel-content{ padding: 4px 14px 22px; font-size:1.02rem; }
+    .chapter-mark{ width:26px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <video class="bg-video" id="video-forward" autoplay muted playsinline preload="auto">
+    <source src="broken-glass.mp4" type="video/mp4">
+  </video>
+  <video class="bg-video" id="video-reverse" muted playsinline preload="auto" style="opacity:0;">
+    <source src="broken-glass-reverse.mp4" type="video/mp4">
+  </video>
+  <div class="bg-scrim"></div>
+  <div class="noise"></div>
+
+  <div class="hero-content">
+    <div class="titleblock">
+      <h1 class="glitch-title">Overload</h1>
+    </div>
+    <p class="subtitle">Venom and Glass</p>
+    <p class="tagline">Some reflections don't break. They bite.</p>
+
+    <svg class="glyph" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M20 2 L20 38 M2 20 L38 20" stroke="currentColor" stroke-width="1"/>
+      <path d="M20 2 L26 12 L20 22 L14 12 Z" stroke="currentColor" stroke-width="1" fill="none"/>
+      <circle cx="20" cy="20" r="3" stroke="currentColor" stroke-width="1"/>
+    </svg>
+
+    <nav class="chapters" aria-label="Índice de capítulos">
+
+      <div class="chapter" data-open="false">
+        <button class="chapter-trigger js-toggle" aria-expanded="false">
+          <span class="chapter-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3 L22 20 H2 Z"/><path d="M12 9v5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>
+          </span>
+          <span class="chapter-label">Trigger warnings</span>
+          <span class="chapter-chevron"></span>
+        </button>
+        <div class="chapter-panel"><div class="chapter-panel-inner"><div class="chapter-panel-content">
+          Esta historia contiene <em>muerte de personajes, violencia gráfica implícita, trauma psicológico, disociación, representación de duelo no convencional, límites y vulneración de la privacidad mental</em>. Se recomienda discreción del lector.
+        </div></div></div>
+      </div>
+
+      <div class="chapter" data-open="false">
+        <button class="chapter-trigger js-toggle" aria-expanded="false">
+          <span class="chapter-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17 3l4 4L8 20l-5 1 1-5Z"/></svg>
+          </span>
+          <span class="chapter-label">Prelude: about the author</span>
+          <span class="chapter-chevron"></span>
+        </button>
+        <div class="chapter-panel"><div class="chapter-panel-inner"><div class="chapter-panel-content chapter-panel-content--rich">
+          <p><strong>wood_no_descansa</strong> es una cuenta de rol que pueden encontrar en distintas plataformas. Lo que van a leer en estas páginas es el lore detrás del personaje, construido a lo largo del tiempo también con fragmentos surgidos de rolear junto a otros usuarios de distintas comunidades relacionadas al universo de Harry Potter. No existe asociación alguna con la autora original ni con la saga de la que este proyecto es fanfic. Si bien muchos elementos están basados en el canon, otros muchos no lo están — y a lo largo de este libro se explica, cuando corresponde, cómo funcionan.</p>
+
+          <h4>Agradecimientos</h4>
+          <p>Este lore no existiría sin quienes le dieron voz a los personajes que acompañan a Oliver en su historia. Gracias por prestarles su tiempo, su escritura y su mirada:</p>
+          <ul>
+            <li><strong>Tabatha Avery</strong> — <a href="https://instagram.com/avery.tabatha_" target="_blank" rel="noopener">@avery.tabatha_</a></li>
+            <li><strong>Zahir Black</strong> — <a href="https://instagram.com/zahixrb" target="_blank" rel="noopener">@zahixrb</a></li>
+            <li><strong>Scarmel Riddle</strong> — <a href="https://instagram.com/scarmel.riddle" target="_blank" rel="noopener">@scarmel.riddle</a></li>
+            <li><strong>Cas Snape</strong> — <a href="https://instagram.com/cas.snape" target="_blank" rel="noopener">@cas.snape</a></li>
+            <li><strong>Fenic Blackwood</strong> — <a href="https://instagram.com/fenix.blackwood" target="_blank" rel="noopener">@fenix.blackwood</a></li>
+            <li><strong>Amatis Castairs Scamander</strong> — <a href="https://instagram.com/amatiscast" target="_blank" rel="noopener">@amatiscast</a></li>
+            <li><strong>Ambar Parr</strong> — <a href="https://instagram.com/ambarnilah" target="_blank" rel="noopener">@ambarnilah</a></li>
+          </ul>
+        </div></div></div>
+      </div>
+
+      <div class="chapter" data-open="false">
+        <button class="chapter-trigger js-toggle" aria-expanded="false">
+          <span class="chapter-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          </span>
+          <span class="chapter-label">Playlist</span>
+          <span class="chapter-chevron"></span>
+        </button>
+        <div class="chapter-panel"><div class="chapter-panel-inner"><div class="chapter-panel-content chapter-panel-content--rich">
+          <p>La banda sonora que acompaña esta historia:</p>
+          <p><a href="https://music.youtube.com/playlist?list=PLIUEuSJt5eZM&si=4qUZ5skGe8wAeg5O" target="_blank" rel="noopener">🎧 Overload: Venom and Glass — Playlist</a></p>
+        </div></div></div>
+      </div>
+
+      <div class="chapter">
+        <a class="chapter-trigger" href="architecture.html">
+          <span class="chapter-mark numeral">I.</span>
+          <span class="chapter-label">Architecture</span>
+          <span class="chapter-chevron"></span>
+        </a>
+      </div>
+
+      <div class="chapter">
+        <a class="chapter-trigger" href="medical-record.html">
+          <span class="chapter-mark numeral">II.</span>
+          <span class="chapter-label">Medical Record</span>
+          <span class="chapter-chevron"></span>
+        </a>
+      </div>
+
+      <div class="chapter">
+        <a class="chapter-trigger" href="academic-files.html">
+          <span class="chapter-mark numeral">III.</span>
+          <span class="chapter-label">Academic Files</span>
+          <span class="chapter-chevron"></span>
+        </a>
+      </div>
+
+      <div class="chapter">
+        <a class="chapter-trigger" href="mindscape.html">
+          <span class="chapter-mark numeral">IV.</span>
+          <span class="chapter-label">Inside the Mindscape</span>
+          <span class="chapter-chevron"></span>
+        </a>
+      </div>
+
+      <div class="chapter" data-open="false">
+        <button class="chapter-trigger js-toggle" aria-expanded="false">
+          <span class="chapter-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 6C10 4.5 7 4 4 5v13c3-1 6-.5 8 1 2-1.5 5-2 8-1V5c-3-1-6-.5-8 1z"/><path d="M12 6v13"/></svg>
+          </span>
+          <span class="chapter-label">Canon references and assets</span>
+          <span class="chapter-chevron"></span>
+        </button>
+        <div class="chapter-panel"><div class="chapter-panel-inner"><div class="chapter-panel-content chapter-panel-content--rich">
+          <h4>Canon referenciado</h4>
+          <p class="inline-links">
+            <a href="https://harrypotter.fandom.com/wiki/Ancient_magic" target="_blank" rel="noopener">Ancient Magic</a>
+            <span aria-hidden="true">•</span>
+            <a href="https://harrypotter.fandom.com/wiki/Mirror_world_spell" target="_blank" rel="noopener">Mirror World Spell</a>
+            <span aria-hidden="true">•</span>
+            <a href="https://harrypotter.fandom.com/es/wiki/Oficina_para_la_Detecci%C3%B3n_y_Confiscaci%C3%B3n_de_Falsificaci%C3%B3n_de_los_Hechizos_Defensivos_y_Objetos_de_Protecci%C3%B3n" target="_blank" rel="noopener">Oficina para la Detección y Confiscación de Falsificación de los Hechizos Defensivos y Objetos de Protección</a>
+            <span aria-hidden="true">•</span>
+            <a href="https://harrypotter.fandom.com/wiki/Isidora_Morganach#Healing_mission" target="_blank" rel="noopener">Isidora Morganach — Healing Mission</a>
+            <span aria-hidden="true">•</span>
+            <a href="https://harrypotter.fandom.com/es/wiki/Legeremancia" target="_blank" rel="noopener">Legeremancia</a>
+            <span aria-hidden="true">•</span>
+            <a href="https://harrypotter.fandom.com/es/wiki/Oclumancia" target="_blank" rel="noopener">Oclumancia</a>
+          </p>
+
+          <h4>Recursos visuales</h4>
+          <p>Las imágenes y recursos visuales utilizados a lo largo de este proyecto provienen de fuentes públicas. Si alguno de sus autores desea que su trabajo sea dado de baja, puede escribirnos a <strong>olivernodescansa@gmail.com</strong> y lo resolvemos a la brevedad.</p>
+          <p class="inline-links">
+            <a href="https://dribbble.com/kuryarti/shots" target="_blank" rel="noopener">Kuryarti</a>
+            <span aria-hidden="true">•</span>
+            <a href="https://dribbble.com/alekseivasileika" target="_blank" rel="noopener">Alekseivasileika</a>
+          </p>
+        </div></div></div>
+      </div>
+
+    </nav>
+
+    <div class="footer">
+      <p class="footer-text">
+        © 2026 Overload: Venom and Glass.<br>
+        Written by @wood_no_descansa · @fokinoliverwood
+      </p>
+      <div class="socials">
+        <a href="https://www.instagram.com/wood_no_descansa/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://x.com/fokinoliverwood" target="_blank" rel="noopener" aria-label="X">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4l16 16M20 4L4 20"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Feed each label's own text into a data attribute so the CSS glitch
+  // layers (::before/::after using attr(data-text)) can duplicate it.
+  document.querySelectorAll('.chapter-label').forEach(function(el){
+    el.setAttribute('data-text', el.textContent.trim());
+  });
+
+  // Accordion — only the rows without a real destination page (TW / Prelude / Playlist)
+  document.querySelectorAll('.js-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var chapter = btn.closest('.chapter');
+      var isOpen = chapter.getAttribute('data-open') === 'true';
+      chapter.setAttribute('data-open', String(!isOpen));
+      btn.setAttribute('aria-expanded', String(!isOpen));
+    });
+  });
+
+  // Ping-pong background video: plays the forward clip, then swaps to a true
+  // reverse-encoded clip (no per-frame seeking, so it plays at real speed).
+  (function(){
+    var fwd = document.getElementById('video-forward');
+    var rev = document.getElementById('video-reverse');
+    if(!fwd || !rev) return;
+
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      rev.remove();
+      fwd.loop = true;
+      return;
+    }
+
+    var showingForward = true;
+
+    function swapTo(showFwd){
+      showingForward = showFwd;
+      var active = showFwd ? fwd : rev;
+      var inactive = showFwd ? rev : fwd;
+      active.currentTime = 0;
+      active.style.opacity = '1';
+      inactive.style.opacity = '0';
+      var p = active.play();
+      if(p && p.catch) p.catch(function(){});
+      inactive.pause();
+    }
+
+    fwd.addEventListener('ended', function(){ swapTo(false); });
+    rev.addEventListener('ended', function(){ swapTo(true); });
+  })();
+</script>
+
+</body>
+</html>

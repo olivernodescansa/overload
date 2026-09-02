@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academic Files — Overload: Venom and Glass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+SC:wght@500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @font-face{
+    font-family:'Doctor Glitch';
+    src: url('Doctor_Glitch.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root{
+    --bg:#040308;
+    --bg-panel:#0a0714;
+    --violet:#8b6bf0;
+    --violet-deep:#4c2f9e;
+    --cyan:#3fd7d0;
+    --text:#eae7f5;
+    --text-dim:#8c86a6;
+    --line: rgba(139,107,240,0.28);
+    --line-soft: rgba(139,107,240,0.14);
+    --ease-out: cubic-bezier(0.19,1,0.22,1);
+    --ease-out-cubic: cubic-bezier(0.215,0.61,0.355,1);
+    --ease-in-out: cubic-bezier(0.645,0.045,0.355,1);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  html{
+    scroll-behavior:smooth;
+  }
+
+  ::selection{ background:var(--violet-deep); color:#fff; }
+
+  /* ---------- SCROLLBAR ---------- */
+  html{
+    scrollbar-width: thin;
+    scrollbar-color: var(--violet) var(--bg);
+  }
+  ::-webkit-scrollbar{
+    width:11px;
+    height:11px;
+  }
+  ::-webkit-scrollbar-track{
+    background: var(--bg);
+    border-left:1px solid var(--line-soft);
+  }
+  ::-webkit-scrollbar-thumb{
+    background: linear-gradient(180deg, var(--violet) 0%, var(--violet-deep) 100%);
+    border-radius:0;
+    border:2px solid var(--bg);
+    box-shadow: inset 0 0 6px rgba(63,215,208,0.25);
+  }
+  ::-webkit-scrollbar-thumb:hover{
+    background: linear-gradient(180deg, var(--cyan) 0%, var(--violet) 100%);
+  }
+  ::-webkit-scrollbar-corner{
+    background: var(--bg);
+  }
+
+  /* ---------- HERO / VIDEO BG ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: clamp(32px, 6vh, 72px) 24px 40px;
+    overflow:hidden;
+    background: var(--bg);
+  }
+
+  .bg-video{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter: saturate(1.25) contrast(1.12) brightness(0.85);
+    z-index:0;
+    transition: opacity 100ms linear;
+  }
+
+  .bg-scrim{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:
+      radial-gradient(ellipse 78% 62% at 50% 30%, rgba(10,7,20,0.05) 0%, rgba(4,3,8,0.28) 55%, rgba(4,3,8,0.68) 100%),
+      linear-gradient(180deg, rgba(4,3,8,0.25) 0%, rgba(4,3,8,0.08) 26%, rgba(4,3,8,0.55) 78%, var(--bg) 100%);
+  }
+
+  .noise{
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ---------- MAIN (centers between header space and footer) ---------- */
+  .page-main{
+    position:relative;
+    z-index:3;
+    flex:1 1 auto;
+    width:100%;
+    max-width:820px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:34px;
+  }
+
+  .page-eyebrow{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:clamp(1.4rem, 3vw, 1.9rem);
+    color:var(--violet);
+    text-shadow:0 0 24px rgba(139,107,240,0.5);
+    margin:0;
+  }
+
+  .page-title{
+    font-family:'Doctor Glitch', 'Playfair Display', serif;
+    font-weight:400;
+    font-size:clamp(2.6rem, 9vw, 5.6rem);
+    line-height:0.95;
+    letter-spacing:0.01em;
+    margin:0;
+    position:relative;
+    color:#f2f0fa;
+    text-shadow: 0 4px 30px rgba(4,3,8,0.9);
+  }
+
+  .page-title::before,
+  .page-title::after{
+    content: attr(data-text);
+    position:absolute;
+    inset:0;
+    background:transparent;
+  }
+  .page-title::before{
+    color:var(--cyan);
+    text-shadow: 0 0 26px rgba(63,215,208,0.55);
+    animation: pg-glitch-1 4.6s var(--ease-in-out) infinite;
+    clip-path: inset(0 0 55% 0);
+    mix-blend-mode: screen;
+    opacity:0;
+  }
+  .page-title::after{
+    color:var(--violet);
+    text-shadow: 0 0 26px rgba(139,107,240,0.55);
+    animation: pg-glitch-2 4.6s var(--ease-in-out) infinite;
+    clip-path: inset(60% 0 0 0);
+    mix-blend-mode: screen;
+    opacity:0;
+  }
+  @keyframes pg-glitch-1{
+    0%, 80%, 100% { transform:translate(0,0); clip-path: inset(0 0 55% 0); opacity:0; }
+    81% { transform:translate(-6px,-2px); clip-path: inset(8% 0 42% 0); opacity:0.9; }
+    84% { transform:translate(4px,1px); clip-path: inset(0 0 68% 0); opacity:0.6; }
+    87% { transform:translate(-3px,0); clip-path: inset(20% 0 25% 0); opacity:0.8; }
+    90% { transform:translate(0,0); opacity:0; }
+  }
+  @keyframes pg-glitch-2{
+    0%, 82%, 100% { transform:translate(0,0); clip-path: inset(60% 0 0 0); opacity:0; }
+    83% { transform:translate(6px,2px); clip-path: inset(35% 0 0 0); opacity:0.85; }
+    86% { transform:translate(-4px,-1px); clip-path: inset(72% 0 0 0); opacity:0.55; }
+    89% { transform:translate(3px,0); clip-path: inset(50% 0 0 0); opacity:0.75; }
+    92% { transform:translate(0,0); opacity:0; }
+  }
+
+  .page-sub{
+    font-family:'Cormorant SC', serif;
+    font-weight:500;
+    font-size:clamp(0.95rem, 2vw, 1.15rem);
+    letter-spacing:0.16em;
+    color:var(--text-dim);
+    margin:0;
+  }
+
+  /* ---------- SCROLL CUE ---------- */
+  .scroll-cue{
+    position:absolute;
+    left:50%;
+    bottom: clamp(20px, 4vh, 40px);
+    z-index:5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    color: var(--text-dim);
+    transform:translateX(-50%);
+    transition: color 200ms ease;
+    animation: scroll-cue-bounce 2.2s ease-in-out infinite;
+  }
+  .scroll-cue:hover, .scroll-cue:focus-visible{
+    color: var(--violet);
+  }
+  .scroll-cue svg{ width:22px; height:22px; display:block; }
+  .scroll-cue:focus-visible{ outline:2px solid var(--cyan); outline-offset:4px; }
+
+  @keyframes scroll-cue-bounce{
+    0%, 100% { transform:translate(-50%, 0); }
+    50%      { transform:translate(-50%, 8px); }
+  }
+
+  /* ---------- BACK BUTTON (same bracket + glitch language as the index rows) ---------- */
+  .back-btn{
+    all:unset;
+    position:fixed;
+    top: clamp(18px, 4vh, 32px);
+    left: clamp(18px, 4vw, 32px);
+    z-index:6;
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 22px;
+    cursor:pointer;
+    box-sizing:border-box;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:500;
+    font-size:0.85rem;
+    letter-spacing:0.06em;
+    color:var(--text);
+  }
+  .back-btn::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    opacity:0;
+    transition: opacity 200ms ease;
+  }
+  .back-btn::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:0;
+    bottom:0;
+    width:16px;
+    height:16px;
+    opacity:0;
+    transition: opacity 200ms ease 40ms;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+  }
+  .back-btn:hover::before, .back-btn:focus-visible::before,
+  .back-btn:hover::after, .back-btn:focus-visible::after{
+    opacity:1;
+  }
+  .back-btn:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
+
+  .back-chevron{
+    position:relative; z-index:1;
+    width:8px; height:8px;
+    border-left:1.5px solid var(--text-dim);
+    border-bottom:1.5px solid var(--text-dim);
+    transform:rotate(45deg);
+    transition: transform 220ms var(--ease-out-cubic), border-color 200ms ease;
+    flex-shrink:0;
+  }
+  .back-btn:hover .back-chevron{ border-color:var(--violet); transform:rotate(45deg) translate(-2px,2px); }
+
+  .back-label{ position:relative; z-index:1; }
+  .back-label::before,
+  .back-label::after{
+    content: attr(data-text);
+    position:absolute;
+    z-index:2;
+    left:0; top:0;
+    width:100%;
+    white-space:nowrap;
+    pointer-events:none;
+    opacity:0;
+  }
+  .back-label::before{ color:var(--violet); text-shadow:0 0 14px rgba(139,107,240,0.65); }
+  .back-label::after{ color:var(--cyan); text-shadow:0 0 14px rgba(63,215,208,0.6); }
+  .back-btn:is(:hover,:focus-visible) .back-label::before{ animation: pg-row-glitch-violet 640ms steps(1) 1; }
+  .back-btn:is(:hover,:focus-visible) .back-label::after{ animation: pg-row-glitch-cyan 640ms steps(1) 1; }
+
+  @keyframes pg-row-glitch-violet{
+    0%   { clip-path: inset(0 0 88% 0);  transform:translate(0,0);    opacity:0; }
+    7%   { clip-path: inset(0 0 58% 0);  transform:translate(-4px,0); opacity:0.9; }
+    15%  { clip-path: inset(28% 0 42% 0); transform:translate(3px,0); opacity:0.65; }
+    23%  { clip-path: inset(0 0 74% 0);  transform:translate(-3px,0); opacity:0.85; }
+    31%  { clip-path: inset(52% 0 8% 0); transform:translate(4px,0);  opacity:0.55; }
+    40%  { clip-path: inset(0 0 88% 0);  transform:translate(0,0);    opacity:0; }
+    100% { opacity:0; }
+  }
+  @keyframes pg-row-glitch-cyan{
+    0%   { clip-path: inset(88% 0 0 0); transform:translate(0,0);     opacity:0; }
+    9%   { clip-path: inset(48% 0 0 0); transform:translate(4px,0);   opacity:0.85; }
+    17%  { clip-path: inset(18% 0 46% 0); transform:translate(-3px,0); opacity:0.6; }
+    25%  { clip-path: inset(58% 0 0 0); transform:translate(3px,0);   opacity:0.8; }
+    33%  { clip-path: inset(8% 0 60% 0); transform:translate(-4px,0);  opacity:0.5; }
+    42%  { clip-path: inset(88% 0 0 0); transform:translate(0,0);     opacity:0; }
+    100% { opacity:0; }
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer{
+    position:relative;
+    z-index:3;
+    margin:44px auto 0;
+    padding:0 24px 48px;
+    width:100%;
+    max-width:760px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+  }
+  .footer-text{
+    text-align:center;
+    font-family:'Space Grotesk', sans-serif;
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(140,134,166,0.6);
+    line-height:1.9;
+  }
+  .footer-text a{
+    color:rgba(140,134,166,0.85);
+    text-decoration:none;
+    border-bottom:1px solid rgba(139,107,240,0.3);
+    transition: color 180ms ease, border-color 180ms ease;
+  }
+  .footer-text a:hover, .footer-text a:focus-visible{
+    color:var(--violet);
+    border-color:var(--violet);
+  }
+  .socials{ display:flex; gap:20px; }
+  .socials a{
+    color:var(--text-dim);
+    transition: color 180ms ease, transform 180ms var(--ease-out-cubic);
+    display:flex;
+  }
+  .socials a:hover{ color:var(--violet); transform:translateY(-2px); }
+  .socials svg{ width:17px; height:17px; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .page-title::before, .page-title::after,
+    .back-label::before, .back-label::after,
+    .back-chevron,
+    .story-cta-label::before, .story-cta-label::after,
+    .story-cta-arrow,
+    .scroll-cue{ animation:none; transition:none; }
+  }
+
+  /* ---------- STORY / READING SECTION ---------- */
+  .story-section{
+    position:relative;
+    z-index:1;
+    background: var(--bg);
+    padding: clamp(56px, 9vh, 96px) 24px 8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .story-content{
+    width:100%;
+    max-width:680px;
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.15rem;
+    line-height:1.85;
+    color:var(--text-dim);
+  }
+
+  .story-lede{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:1.5rem;
+    color:var(--text);
+    text-align:center;
+    margin:0 0 44px;
+  }
+
+  .story-narration{
+    margin:0 0 24px;
+  }
+
+  .story-dialogue-block{
+    margin:0 0 24px;
+  }
+  .story-speaker{
+    display:block;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:0.66rem;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  .story-speaker--aurelio{ color:var(--cyan); }
+  .story-speaker--avery{ color:var(--violet); }
+
+  .story-dialogue{
+    margin:0;
+    padding-left:18px;
+    border-left:2px solid var(--line);
+    color:var(--text);
+    font-size:1.18rem;
+  }
+  .story-dialogue--aurelio{ border-left-color:var(--cyan); }
+  .story-dialogue--avery{ border-left-color:var(--violet); }
+
+  /* ---------- MANUSCRIPT FRAGMENT CONTAINER ---------- */
+  .manuscript{
+    position:relative;
+    margin:36px 0;
+    padding:26px 26px 28px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+  }
+  .manuscript::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:0; bottom:0;
+    width:16px; height:16px;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+  }
+  .manuscript-header{
+    position:relative; z-index:1;
+    border-bottom:1px solid var(--line-soft);
+    padding-bottom:16px;
+    margin-bottom:18px;
+    font-family:'Space Grotesk', sans-serif;
+  }
+  .manuscript-title{
+    display:block;
+    color:var(--text);
+    font-weight:600;
+    font-size:0.76rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  .manuscript-tag{
+    display:inline-block;
+    padding:4px 10px;
+    border:1px solid var(--violet);
+    color:var(--violet);
+    font-size:0.62rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+  }
+  .manuscript-note{
+    position:relative; z-index:1;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:0.95rem;
+    color:var(--text-dim);
+    opacity:0.85;
+    margin:0 0 18px;
+  }
+  .manuscript-note--end{
+    margin:18px 0 0;
+  }
+  .manuscript-body{
+    position:relative; z-index:1;
+  }
+  .manuscript-body p{
+    font-family:'Cormorant Garamond', serif;
+    font-size:1.05rem;
+    line-height:1.75;
+    color:var(--text-dim);
+    margin:0 0 18px;
+  }
+  .manuscript-body p:last-child{
+    margin-bottom:0;
+  }
+
+  /* ---------- FINAL CTA: external link ---------- */
+  .story-cta{
+    all:unset;
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    width:100%;
+    max-width:680px;
+    margin:52px auto 0;
+    padding:22px 18px;
+    cursor:pointer;
+    box-sizing:border-box;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .story-cta::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:var(--bg-panel);
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+    opacity:0;
+    transition: opacity 200ms ease;
+  }
+  .story-cta::after{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:0; bottom:0;
+    width:16px; height:16px;
+    opacity:0;
+    transition: opacity 200ms ease 40ms;
+    background: linear-gradient(135deg,
+      transparent calc(50% - 1px),
+      var(--violet) calc(50% - 1px),
+      var(--violet) calc(50% + 1px),
+      transparent calc(50% + 1px));
+  }
+  .story-cta:hover::before, .story-cta:focus-visible::before,
+  .story-cta:hover::after, .story-cta:focus-visible::after{
+    opacity:1;
+  }
+  .story-cta:focus-visible{ outline:2px solid var(--cyan); outline-offset:-2px; }
+
+  .story-cta-mark{
+    position:relative; z-index:1;
+    flex-shrink:0;
+    width:22px; height:22px;
+    color:var(--text-dim);
+    transition:color 200ms ease;
+  }
+  .story-cta-mark svg{ width:100%; height:100%; display:block; }
+  .story-cta:hover .story-cta-mark{ color:var(--violet); }
+
+  .story-cta-label{
+    position:relative; z-index:1;
+    flex:1;
+    text-align:left;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:500;
+    font-size:1rem;
+    letter-spacing:0.01em;
+    color:var(--text);
+  }
+  .story-cta-label::before,
+  .story-cta-label::after{
+    content: attr(data-text);
+    position:absolute;
+    z-index:2;
+    left:0; top:0;
+    width:100%;
+    pointer-events:none;
+    opacity:0;
+  }
+  .story-cta-label::before{ color:var(--violet); text-shadow:0 0 14px rgba(139,107,240,0.65); }
+  .story-cta-label::after{ color:var(--cyan); text-shadow:0 0 14px rgba(63,215,208,0.6); }
+  .story-cta:is(:hover,:focus-visible) .story-cta-label::before{ animation: pg-row-glitch-violet 640ms steps(1) 1; }
+  .story-cta:is(:hover,:focus-visible) .story-cta-label::after{ animation: pg-row-glitch-cyan 640ms steps(1) 1; }
+
+  .story-cta-arrow{
+    position:relative; z-index:1;
+    flex-shrink:0;
+    width:15px; height:15px;
+    color:var(--text-dim);
+    transition: color 200ms ease, transform 220ms var(--ease-out-cubic);
+  }
+  .story-cta-arrow svg{ width:100%; height:100%; display:block; }
+  .story-cta:hover .story-cta-arrow{ color:var(--violet); transform:translate(2px,-2px); }
+
+  @media (max-width: 560px){
+    .story-content{ font-size:1.05rem; }
+    .story-dialogue{ font-size:1.08rem; padding-left:14px; }
+    .story-lede{ font-size:1.3rem; }
+    .manuscript{ padding:20px 18px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <video class="bg-video" id="video-forward" autoplay muted playsinline preload="auto">
+    <source src="academic-files.mp4" type="video/mp4">
+  </video>
+  <video class="bg-video" id="video-reverse" muted playsinline preload="auto" style="opacity:0;">
+    <source src="academic-files-reverse.mp4" type="video/mp4">
+  </video>
+  <div class="bg-scrim"></div>
+  <div class="noise"></div>
+
+    <a class="back-btn" href="index.html">
+      <span class="back-chevron"></span>
+      <span class="back-label" data-text="Volver al índice">Volver al índice</span>
+    </a>
+
+  <main class="page-main">
+    <p class="page-eyebrow">III.</p>
+    <h1 class="page-title" data-text="Academic Files">Academic Files</h1>
+    <p class="page-sub">Overload: Venom and Glass</p>
+  </main>
+
+  <a class="scroll-cue" href="#story" aria-label="Desplazarse para leer el capítulo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+  </a>
+</div>
+
+<article class="story-section" id="story">
+  <div class="story-content">
+          <p class="story-narration">La oficina a esa hora ya está vacía del resto del personal, que es exactamente el motivo por el que Aurelio elige quedarse hasta tarde los martes. Cajas de decomiso apiladas contra la pared, cada una con su etiqueta de cera y su número de expediente, esperando el turno de ser catalogadas, fichadas y enviadas a la bóveda que corresponda. La que tiene enfrente lleva el sello de los Morganach —un linaje que dejó de existir hace generaciones y cuya última propiedad recién ahora terminó de pasar por los trámites de decomiso post mortem, tan lento como todo en el Ministerio cuando no hay nadie vivo apurando el trámite.</p>
+
+          <p class="story-narration">Abre la caja con el mismo cuidado profesional de siempre, aunque no haya nadie mirando. Adentro, entre objetos menores que ya anotó sin mayor interés, hay un legajo de pergaminos cosidos a mano, la tapa desprendida, la tinta corrida en los bordes por la humedad de guardarse mal durante décadas. Ningún nombre de autor en la portada. Ninguna fecha completa.</p>
+
+          <p class="story-narration">Lo abre por donde el lomo cede solo, a mitad de página, y empieza a leer sin proponérselo demasiado — la clase de lectura que se hace para descartar, no para encontrar.</p>
+
+      <div class="manuscript">
+        <div class="manuscript-header">
+          <span class="manuscript-title">Fragmento de manuscrito académico</span>
+          <span class="manuscript-tag">Sin catalogar</span>
+        </div>
+        <p class="manuscript-note">[...fragmento incompleto, sin datos de autoría en esta copia. Comienza a mitad de párrafo.]</p>
+        <div class="manuscript-body">
+          <p>...razón por la cual la distinción entre magia convencional y Magia Ancestral no puede sostenerse únicamente sobre la base del efecto observable, sino sobre el origen de la capacidad misma. La magia convencional se aprende, se canaliza a través de un instrumento externo y responde, en mayor o menor medida, a la voluntad consciente del practicante. La Magia Ancestral, en los pocos casos documentados con algún rigor, no muestra ese mismo patrón de adquisición: quienes la portan no la aprenden, la reconocen, generalmente demasiado tarde y en circunstancias que ellos mismos no habrían elegido.</p>
+
+          <p>Se ha discutido extensamente si la percepción de esta clase de magia constituye en sí misma un don separado o una consecuencia directa de portarla. La postura mayoritaria —aunque no unánime— sostiene que solo un número reducido de individuos, verificado hasta la fecha en no más de tres casos documentables con fuentes primarias, posee la capacidad de percibir su existencia sin haber sido expuesto directamente a una manifestación. Esto complica cualquier intento de catalogación sistemática: no puede estudiarse aquello que la mayoría de los investigadores, por definición, no puede ver.</p>
+
+          <p>Un patrón que sí parece sostenerse a través de los casos disponibles es el de la manifestación involuntaria ante estados de sobrecarga —ya sea por trauma agudo, por exposición a magia de una intensidad desproporcionada para el sujeto, o por ambas causas combinadas en un mismo evento. En ninguno de los casos revisados la manifestación inicial fue buscada ni anticipada por quien la porta. Cabe preguntarse si esto responde a una condición estructural de la Magia Ancestral en sí, o simplemente a que un poder de esta naturaleza, de manifestarse de forma voluntaria y temprana, sería identificado y neutralizado —por la vía que fuera— antes de tener oportunidad de estabilizarse. No existe forma de responder esta pregunta con los datos actualmente disponibles.</p>
+
+          <p>Más especulativo, y por lo tanto tratado aquí con la debida cautela, es el terreno de las aplicaciones no orientadas hacia el exterior. La literatura existente se concentra casi en su totalidad en manifestaciones ofensivas o defensivas dirigidas hacia otros —lo cual es comprensible, dado que son las únicas lo bastante visibles como para dejar registro—. Pero si la premisa de que esta magia responde a la estructura interna del portador es correcta, no hay razón teórica para descartar que...</p>
+        </div>
+        <p class="manuscript-note manuscript-note--end">[el fragmento se interrumpe aquí; el resto de la página falta o es ilegible]</p>
+      </div>
+
+          <p class="story-narration">Aurelio pasa la página. No hay más. El resto del legajo está ilegible, o directamente ausente — arrancado, quizás, por alguien que sabía exactamente qué parte no quería que se conservara.</p>
+
+          <p class="story-narration">Se queda quieto un momento, con el pergamino todavía entre las manos, releyendo la última frase cortada a la mitad. No hay razón teórica para descartar que... No necesita que el texto termine la idea. Lleva semanas viendo, en las sesiones semanales con un chico de doce años, exactamente el tipo de cosa que este párrafo se queda sin terminar de nombrar.</p>
+
+          <p class="story-narration">No lo cataloga. No hace la ficha correspondiente, no lo suma al registro de decomiso, no lo devuelve a la caja con el resto. Lo dobla con cuidado, lo guarda en el bolsillo interno de la túnica, y anota mentalmente que la caja Morganach, a partir de ahora, tiene un ítem menos de los que figuran en el inventario original — un descuido administrativo que nadie, jamás, va a tener motivos para revisar.</p>
+
+          <p class="story-narration">Cierra la oficina con llave, aunque no haya nadie más en el piso, y se va.</p>
+  </div>
+
+  <a class="story-cta" href="https://wikihp.fandom.com/es/wiki/Aurelio_Shacklebolt" target="_blank" rel="noopener">
+    <span class="story-cta-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+    </span>
+    <span class="story-cta-label" data-text="Ficha de Aurelio Shacklebolt">Ficha de Aurelio Shacklebolt</span>
+    <span class="story-cta-arrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
+    </span>
+  </a>
+</article>
+
+<div class="footer">
+  <p class="footer-text">
+    © 2026 Overload: Venom and Glass.<br>
+    Written by @wood_no_descansa · @fokinoliverwood
+  </p>
+  <div class="socials">
+    <a href="https://www.instagram.com/wood_no_descansa/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+    </a>
+    <a href="https://x.com/fokinoliverwood" target="_blank" rel="noopener" aria-label="X">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4l16 16M20 4L4 20"/></svg>
+    </a>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var fwd = document.getElementById('video-forward');
+    var rev = document.getElementById('video-reverse');
+    if(!fwd || !rev) return;
+
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      rev.remove();
+      fwd.loop = true;
+      return;
+    }
+
+    var showingForward = true;
+
+    function swapTo(showFwd){
+      showingForward = showFwd;
+      var active = showFwd ? fwd : rev;
+      var inactive = showFwd ? rev : fwd;
+      active.currentTime = 0;
+      active.style.opacity = '1';
+      inactive.style.opacity = '0';
+      var p = active.play();
+      if(p && p.catch) p.catch(function(){});
+      inactive.pause();
+    }
+
+    fwd.addEventListener('ended', function(){ swapTo(false); });
+    rev.addEventListener('ended', function(){ swapTo(true); });
+  })();
+</script>
+
+</body>
+</html>
