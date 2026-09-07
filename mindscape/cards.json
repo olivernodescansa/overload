@@ -14,7 +14,7 @@
     "eyebrow": "Capa 02 — Livie a su lado, en silencio",
     "fecha": "2026-09-08",
     "fechaDisplay": "08/09/2026",
-    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "media": { "type": "video", "src": "mindscape/media/02-Silent-Company.mp4" },
     "chapter": "mindscape/chapters/02-silent-company.html"
   },
   {

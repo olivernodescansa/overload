@@ -401,8 +401,42 @@
     margin:0 0 44px;
   }
 
+  .threshold-incantation{
+    text-align:center;
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-weight:600;
+    font-size:1.6rem;
+    letter-spacing:0.03em;
+    color:var(--violet);
+    text-shadow:0 0 22px rgba(139,107,240,0.55);
+    margin:36px 0 8px;
+  }
+
   .story-narration{
     margin:0 0 24px;
+  }
+
+  .story-divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin:8px 0 32px;
+    color:var(--violet);
+    opacity:0.7;
+  }
+  .story-divider::before,
+  .story-divider::after{
+    content:"";
+    width:44px;
+    height:1px;
+    background:var(--line);
+  }
+  .story-divider svg{
+    width:10px;
+    height:10px;
+    flex-shrink:0;
   }
 
   .story-dialogue-block{
@@ -419,6 +453,7 @@
   }
   .story-speaker--oliver{ color:var(--cyan); }
   .story-speaker--tabatha{ color:var(--violet); }
+  .story-speaker--other{ color:var(--violet); }
 
   .story-dialogue{
     margin:0;
@@ -429,6 +464,7 @@
   }
   .story-dialogue--oliver{ border-left-color:var(--cyan); }
   .story-dialogue--tabatha{ border-left-color:var(--violet); }
+  .story-dialogue--other{ border-left-color:var(--violet); }
 
   /* ---------- MIRROR CAROUSEL ---------- */
   .mirror-section{
@@ -452,6 +488,13 @@
     font-size:1rem;
     color:var(--text-dim);
     padding:20px 0;
+  }
+  .mirror-preview-banner{
+    color:var(--violet) !important;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    font-family:'Space Grotesk', sans-serif !important;
+    font-style:normal;
   }
 
   .mirror-carousel{
@@ -705,6 +748,24 @@
 <article class="story-section" id="story">
   <div class="story-content">
     <p class="story-lede">Cartografía del mindscape</p>
+
+    <p class="story-narration">Nadie que conozca a Oliver Wood lo conoce del todo. Ni siquiera él.</p>
+
+    <p class="story-narration">Lo que sigue no es lo que él contaría, si se lo preguntaran. No es una confesión, ni una carta, ni un diario escrito para que alguien más lo lea algún día. Es otra cosa: lo que queda cuando se retira, aunque sea por un momento, la mano que durante diez años estuvo parada en la puerta, filtrando qué entra y qué sale.</p>
+
+    <p class="story-narration">Oliver habla mucho. Eso ya lo sabe cualquiera que haya cruzado dos palabras con él. Lo que casi nadie sabe es que cada palabra que dice pasa primero por una arquitectura entera construida para decidir, antes que él mismo, qué versión de la verdad conviene mostrar, incluso a él mismo. No es mentira, exactamente. Es curaduría. Una selección tan bien entrenada que ni el curador se acuerda ya de que está eligiendo.</p>
+
+    <p class="story-narration">Por eso lo que sigue no puede contarlo él. No porque no quiera —a esta altura, ya no importa si quiere o no— sino porque estructuralmente no puede. Pedirle a Oliver que narre su propia mente es como pedirle al espejo que describa lo que hay detrás del vidrio.</p>
+
+    <p class="story-narration">Así que esto no lo cuenta él.</p>
+
+    <p class="story-narration">Lo que sigue es un recorrido sin guía. Pasillo por pasillo, espejo por espejo, sin la cortesía de una voz que decida por adelantado qué parte conviene suavizar. Algunas de estas superficies devuelven exactamente lo que Oliver querría que se viera desde afuera —el chico que sonríe, el que organiza, el que siempre tiene una frase lista. Otras no reflejan nada en absoluto, y ahí, justo ahí, es donde vale la pena detenerse más tiempo del que resulta cómodo.</p>
+
+    <p class="story-narration">No todo lo que hay en las páginas siguientes va a coincidir con lo que Oliver diría de sí mismo en cualquier otro capítulo de este libro. Eso no es un error de continuidad. Es, quizás, el único punto en el que este libro dice la verdad sin que nadie se la pida primero.</p>
+
+    <p class="story-narration">Y aun así, ni siquiera acá adentro hay garantía de exactitud. El trauma deja huecos, y los huecos no se quedan vacíos por mucho tiempo: se llenan solos, con lo que se pueda, con lo que duela menos o con lo que tenga más sentido para quien los mira desde adentro. Los borrados no son silencio puro tampoco —dejan formas, bordes, la sombra de algo que estuvo. Así que ni siquiera estos espejos son un registro perfecto de lo que pasó. Son lo más cerca que Oliver puede llegar a estar de la verdad, interpretada con las herramientas rotas que tiene a mano, y no necesariamente la verdad misma.</p>
+
+    <p class="threshold-incantation">¡Legeremens!</p>
   </div>
 
   <section class="mirror-section" aria-label="Capa de mapa — espejos del mindscape">
@@ -780,8 +841,16 @@
     var today = new Date();
     today.setHours(0,0,0,0);
 
+    // Preview mode: add ?preview to the URL (e.g. mindscape.html?preview) to
+    // ignore release dates while testing locally. Cards with no date at all
+    // (El Veneno — not a countdown, just never a mirror) stay locked either way.
+    function isPreview(){
+      return new URLSearchParams(window.location.search).has('preview');
+    }
+
     function isUnlocked(card){
       if(!card.fecha) return false;
+      if(isPreview()) return true;
       return new Date(card.fecha + 'T00:00:00') <= today;
     }
 
@@ -889,6 +958,14 @@
         .finally(function(){
           reader.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+    }
+
+    if(isPreview()){
+      var heading = document.querySelector('.mirror-section-heading');
+      if(heading){
+        heading.textContent = 'Modo vista previa — todas las fechas están desbloqueadas.';
+        heading.classList.add('mirror-preview-banner');
+      }
     }
 
     fetch('mindscape/cards.json')
