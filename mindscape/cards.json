@@ -2,7 +2,7 @@
   {
     "id": "01",
     "titulo": "Unsealed",
-    "eyebrow": "Capa 01 — El tío / Godric's Hollow",
+    "eyebrow": "Capa 01 — El campo en Godric's Hollow",
     "fecha": "2026-09-01",
     "fechaDisplay": "01/09/2026",
     "media": { "type": "video", "src": "mindscape/media/01-unsealed.mp4" },
@@ -11,7 +11,7 @@
   {
     "id": "02",
     "titulo": "Silent Company",
-    "eyebrow": "Capa 02 — Livie a su lado, en silencio",
+    "eyebrow": "Capa 02 — Complicidad de hermanos",
     "fecha": "2026-09-08",
     "fechaDisplay": "08/09/2026",
     "media": { "type": "video", "src": "mindscape/media/02-Silent-Company.mp4" },
@@ -20,10 +20,10 @@
   {
     "id": "03",
     "titulo": "Solo Flight",
-    "eyebrow": "Capa 03 — Primer vuelo solo, sin nadie mirando",
+    "eyebrow": "Capa 03 — El primer vuelo en soledad",
     "fecha": "2026-09-15",
     "fechaDisplay": "15/09/2026",
-    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "media": { "type": "image", "src": "mindscape/media/03-Solo-Flight.mp4" },
     "chapter": "mindscape/chapters/03-solo-flight.html"
   },
   {
@@ -32,16 +32,16 @@
     "eyebrow": "Capa 04 — Expreso de Hogwarts, primer año",
     "fecha": "2026-09-22",
     "fechaDisplay": "22/09/2026",
-    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "media": { "type": "image", "src": "mindscape/media/04-First-Departure.png" },
     "chapter": "mindscape/chapters/04-first-departure.html"
   },
   {
     "id": "05",
     "titulo": "Cold Stone",
-    "eyebrow": "Capa 05 — Mazmorras, clase de Pociones",
+    "eyebrow": "Capa 05 — Mazmorras, el arte de aparentar",
     "fecha": "2026-09-29",
     "fechaDisplay": "29/09/2026",
-    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "media": { "type": "image", "src": "mindscape/media/05-cold-stone.mp4" },
     "chapter": "mindscape/chapters/05-cold-stone.html"
   },
   {
