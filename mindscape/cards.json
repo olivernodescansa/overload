@@ -1,0 +1,119 @@
+[
+  {
+    "id": "01",
+    "titulo": "Unsealed",
+    "eyebrow": "Capa 01 — El tío / Godric's Hollow",
+    "fecha": "2026-09-01",
+    "fechaDisplay": "01/09/2026",
+    "media": { "type": "video", "src": "mindscape/media/01-unsealed.mp4" },
+    "chapter": "mindscape/chapters/01-unsealed.html"
+  },
+  {
+    "id": "02",
+    "titulo": "Silent Company",
+    "eyebrow": "Capa 02 — Livie a su lado, en silencio",
+    "fecha": "2026-09-08",
+    "fechaDisplay": "08/09/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/02-silent-company.html"
+  },
+  {
+    "id": "03",
+    "titulo": "Solo Flight",
+    "eyebrow": "Capa 03 — Primer vuelo solo, sin nadie mirando",
+    "fecha": "2026-09-15",
+    "fechaDisplay": "15/09/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/03-solo-flight.html"
+  },
+  {
+    "id": "04",
+    "titulo": "First Departure",
+    "eyebrow": "Capa 04 — Expreso de Hogwarts, primer año",
+    "fecha": "2026-09-22",
+    "fechaDisplay": "22/09/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/04-first-departure.html"
+  },
+  {
+    "id": "05",
+    "titulo": "Cold Stone",
+    "eyebrow": "Capa 05 — Mazmorras, clase de Pociones",
+    "fecha": "2026-09-29",
+    "fechaDisplay": "29/09/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/05-cold-stone.html"
+  },
+  {
+    "id": "06",
+    "titulo": "Glasswork",
+    "eyebrow": "Capa 06 — La sesión donde aprende a construir espejos",
+    "fecha": "2026-10-06",
+    "fechaDisplay": "06/10/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/06-glasswork.html"
+  },
+  {
+    "id": "07",
+    "titulo": "Silver Mist",
+    "eyebrow": "Capa 07 — Cuando conoció a Tabatha",
+    "fecha": "2026-10-13",
+    "fechaDisplay": "13/10/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/07-silver-mist.html"
+  },
+  {
+    "id": "08",
+    "titulo": "Unsent",
+    "eyebrow": "Capa 08 — Una carta jamás enviada",
+    "fecha": "2026-10-20",
+    "fechaDisplay": "20/10/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/08-unsent.html"
+  },
+  {
+    "id": "09",
+    "titulo": "Empty",
+    "eyebrow": "Capa 09 — La muerte de Tabatha",
+    "fecha": "2026-10-27",
+    "fechaDisplay": "27/10/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/09-empty.html"
+  },
+  {
+    "id": "10",
+    "titulo": "Venom",
+    "eyebrow": "Capa 10 — El Veneno",
+    "fecha": null,
+    "fechaDisplay": "—",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": null
+  },
+  {
+    "id": "11",
+    "titulo": "Taken",
+    "eyebrow": "Capa 11 — El secuestro",
+    "fecha": "2026-11-03",
+    "fechaDisplay": "03/11/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/11-taken.html"
+  },
+  {
+    "id": "12",
+    "titulo": "The Ring",
+    "eyebrow": "Capa 12 — El secuestro de Wood y el rescate de Zahir",
+    "fecha": "2026-11-10",
+    "fechaDisplay": "10/11/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/12-the-ring.html"
+  },
+  {
+    "id": "13",
+    "titulo": "White Noise",
+    "eyebrow": "Capa 13 — El ataque (Legeremancia + asesinato)",
+    "fecha": "2026-11-17",
+    "fechaDisplay": "17/11/2026",
+    "media": { "type": "image", "src": "mindscape/media/default-glass.png" },
+    "chapter": "mindscape/chapters/13-white-noise.html"
+  }
+]
