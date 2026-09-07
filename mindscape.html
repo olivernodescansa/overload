@@ -939,7 +939,7 @@
       }
 
       readerContent.innerHTML = '<p class="mirror-reader-placeholder">Abriendo el espejo…</p>';
-      fetch(card.chapter)
+      fetch(card.chapter, { cache: 'no-store' })
         .then(function(res){
           if(!res.ok) throw new Error('not found');
           return res.text();
@@ -968,7 +968,7 @@
       }
     }
 
-    fetch('mindscape/cards.json')
+    fetch('mindscape/cards.json', { cache: 'no-store' })
       .then(function(res){ return res.json(); })
       .then(function(cards){
         carousel.innerHTML = '';
