@@ -858,8 +858,9 @@
 
     function buildMedia(card, unlocked){
       var media = unlocked ? (card.media || DEFAULT_MEDIA) : DEFAULT_MEDIA;
+      var isVideo = media.type === 'video' || /\.(mp4|webm|mov)$/i.test(media.src || '');
 
-      if(media.type === 'video'){
+      if(isVideo){
         var video = document.createElement('video');
         video.className = 'mirror-card-video';
         video.src = media.src;
